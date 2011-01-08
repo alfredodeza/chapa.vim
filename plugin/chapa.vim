@@ -8,14 +8,15 @@
 "
 "============================================================================
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Functions
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if exists("g:loaded_chapa") || &cp
+  finish
+endif
+
 "{{{ Helpers
 
 " In certain situations, it allows you to echo something without 
 " having to hit Return again to do exec the command.
-function! Echo(msg)
+function! s:Echo(msg)
   let x=&ruler | let y=&showcmd
   set noruler noshowcmd
   redraw
@@ -25,15 +26,17 @@ endfun
 
 "}}}
 
+"{{{ Main Functions 
+
 " Select an object ("class"/"function")
-function! PythonSelectObject(obj)
+function! s:PythonSelectObject(obj)
   " Go to the object declaration
   normal $
-  call FindPythonObject(a:obj, -1)
+  call s:FindPythonObject(a:obj, -1)
   let beg = line('.')
   exec beg
 
-  let until = NextIndent(1, 1, 0, 1)
+  let until = s:NextIndent(1, 1, 0, 1)
   let line_moves = until - beg
   
   if line_moves > 0
@@ -44,7 +47,7 @@ function! PythonSelectObject(obj)
 endfunction
 
 
-fun! NextIndent(exclusive, fwd, lowerlevel, skipblanks)
+function! s:NextIndent(exclusive, fwd, lowerlevel, skipblanks)
   let line = line('.')
   let column = col('.')
   let lastline = line('$')
@@ -76,7 +79,7 @@ endfunction
 "     :call FindPythonObject("function", -1)
 " Functions Forwards:
 "     :call FindPythonObject("function")
-function! FindPythonObject(obj, direction)
+function! s:FindPythonObject(obj, direction)
   if (a:obj == "class")
     let objregexp = "^\\s*class\\s\\+[a-zA-Z0-9_]\\+"
         \ . "\\s*\\((\\([a-zA-Z0-9_,. \\t\\n]\\)*)\\)\\=\\s*:"
@@ -89,4 +92,9 @@ function! FindPythonObject(obj, direction)
   endif
   let res = search(objregexp, flag)
 endfunction
+"}}}
 
+"{{{ Misc 
+command! -nargs=0 ChapaPythonFunction call s:PythonSelectObject("function")
+command! -nargs=0 ChapaPythonClass call s:PythonSelectObject("class")
+"}}}
