@@ -105,8 +105,19 @@ endfunction
 "}}}
 
 "{{{ Misc 
+" Visual Mode Selection
 command! -nargs=0 ChapaVisualFunction call s:PythonSelectObject("function")
 command! -nargs=0 ChapaVisualClass call s:PythonSelectObject("class")
+
+" Method movement
 command! -nargs=0 ChapaPreviousMethod call s:FindPythonObject("method", -1)
 command! -nargs=0 ChapaNextMethod call s:FindPythonObject("method", 1)
+
+" Class movement
+command! -nargs=0 ChapaPreviousClass call s:FindPythonObject("class", -1)
+command! -nargs=0 ChapaNextClass call s:FindPythonObject("class", 1)
+
+" Function movement
+command! -nargs=0 ChapaPreviousFunction call s:FindPythonObject("function", -1)
+command! -nargs=0 ChapaNextFunction call s:FindPythonObject("function", 1)
 "}}}
