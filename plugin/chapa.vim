@@ -36,11 +36,11 @@ function! s:PythonSelectObject(obj)
   let beg = line('.')
   exec beg
 
-  let until = s:NextIndent(1, 1, 0, 1)
+  let until = s:NextIndent(1, 1, 0, 0)
   let line_moves = until - beg
   
   if line_moves > 0
-    execute "normal V" .line_moves. "j"
+    execute "normal V" . line_moves . "j"
   else
     execute "normal VG" 
   endif
@@ -95,6 +95,6 @@ endfunction
 "}}}
 
 "{{{ Misc 
-command! -nargs=0 ChapaPythonFunction call s:PythonSelectObject("function")
-command! -nargs=0 ChapaPythonClass call s:PythonSelectObject("class")
+command! -nargs=0 ChapaVisualFunction call s:PythonSelectObject("function")
+command! -nargs=0 ChapaVisualClass call s:PythonSelectObject("class")
 "}}}
