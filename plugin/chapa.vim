@@ -92,7 +92,9 @@ function! s:FindPythonObject(obj, direction)
   elseif (a:obj == "method")
     let objregexp = "^\\s*def\\s\\+[a-zA-Z0-9_]\\+\\s*(\\s*self\\_[^:#]*)\\s*:"
   else
-    let objregexp = "^\\s*def\\s\\+[a-zA-Z0-9_]\\+\\s*(\\_[^:#]*)\\s*:"
+    " Relaxes the original RegExp to be able to match a bit more easier 
+    " orig regexp: "^\\s*def\\s\\+[a-zA-Z0-9_]\\+\\s*(\\_[^:#]*)\\s*:"
+    let objregexp = "^\\s*def\\s\\+[a-zA-Z0-9_]\\+"
   endif
   let flag = "W"
   if (a:direction == -1)
