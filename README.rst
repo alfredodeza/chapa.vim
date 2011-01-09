@@ -27,10 +27,10 @@ pure VIM syntax.
 
 Straightforward (for now). Chapa has 2 public calls that you can map to 
 anything you want. If you had a leader mapping, it woul look similar to 
-this:
+this::
 
-nmap <Leader>c <Esc>:ChapaVisualClass <CR>
-nmap <Leader>f <Esc>:ChapaVisualFunction <CR>
+    nmap <Leader>c <Esc>:ChapaVisualClass <CR>
+    nmap <Leader>f <Esc>:ChapaVisualFunction <CR>
 
 When either is called, it goes to the start of the selection and starts a 
 visual block until indentation no longer applies.
