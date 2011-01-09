@@ -25,18 +25,39 @@ pure VIM syntax.
 2. Usage                                
 ==============================================================================
 
-Straightforward (for now). Chapa has 2 public calls that you can map to 
-anything you want. If you had a leader mapping, it woul look similar to 
-this::
+Straightforward (for now). Chapa has 8 public calls that you can map to 
+anything you want. 
 
-    nmap <Leader>c <Esc>:ChapaVisualClass <CR>
-    nmap <Leader>f <Esc>:ChapaVisualFunction <CR>
+You can map those callables to anything you want, but below is how the 
+author maps them (better mnemonics)::
 
-When either is called, it goes to the start of the selection and starts a 
-visual block until indentation no longer applies.
+  " Function Movement
+  nnoremap fpf <Esc>:ChapaNextFunction<CR>
+  nnoremap Fpf <Esc>:ChapaPreviousFunction<CR>
 
-If the requested search (function or class) is not found, the call simply 
-returns and nothing should happen.
+  " Class Movement
+  nnoremap fpc <Esc>:ChapaNextClass<CR>
+  nnoremap Fpc <Esc>:ChapaPreviousClass<CR>
+
+  " Method Movement
+  nnoremap fpm <Esc>:ChapaNextMethod<CR>
+  nnoremap Fpm <Esc>:ChapaPreviousMethod<CR>
+
+  " Method Visual Select 
+  nnoremap vapc <Esc>:ChapaVisualClass<CR>
+
+  " Class Visual Select
+  nnoremap vapf <Esc>:ChapaVisualFunction<CR>
+
+If the requested search (function, class or method) is not found, the call simply 
+returns and nothing should happen. However, there is an error message that should 
+display by default, explaining what it was supposed to search and in what 
+direction.
+
+You can disable this by adding a chapa-specific variable in your vimrc::
+
+  let g:chapa_messages = 0
+
 
 3. License                             
 ==============================================================================
