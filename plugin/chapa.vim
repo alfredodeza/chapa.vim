@@ -32,11 +32,18 @@ endfun
 function! s:PythonSelectObject(obj)
   " Go to the object declaration
   normal $
-  call s:FindPythonObject(a:obj, -1)
+  let rev = s:FindPythonObject(a:obj, -1)
+  if (! rev)
+    let fwd = s:FindPythonObject(a:obj, 1)
+    if (! fwd)
+      return
+     endif
+   endif
+
   let beg = line('.')
   exec beg
 
-  let until = s:NextIndent(1, 1, 0, 0)
+  let until = s:NextIndent(1)
   let line_moves = until - beg
   
   if line_moves > 0
@@ -47,22 +54,18 @@ function! s:PythonSelectObject(obj)
 endfunction
 
 
-function! s:NextIndent(exclusive, fwd, lowerlevel, skipblanks)
+function! s:NextIndent(fwd)
   let line = line('.')
   let column = col('.')
   let lastline = line('$')
   let indent = indent(line)
   let stepvalue = a:fwd ? 1 : -1
+
   while (line > 0 && line <= lastline)
     let line = line + stepvalue
-    if ( ! a:lowerlevel && indent(line) == indent ||
-          \ a:lowerlevel && indent(line) < indent)
-      if (! a:skipblanks || strlen(getline(line)) > 0)
-        if (a:exclusive)
-          let line = line - stepvalue
-        endif
-        return line
-      endif
+
+    if (indent(line) <= indent && strlen(getline(line)) > 0)
+      return line - 1
     endif
   endwhile
 endfunction
@@ -90,7 +93,12 @@ function! s:FindPythonObject(obj, direction)
   if (a:direction == -1)
     let flag = flag."b"
   endif
-  let res = search(objregexp, flag)
+  let result = search(objregexp, flag)
+  if result
+      return line('.') 
+  else 
+      return 
+  endif
 endfunction
 "}}}
 
