@@ -10,7 +10,7 @@ directory.
 I would highly recommend you use something like Pathogen though, it 
 makes dealing with VIM plugins way easier.
 
-1. Intro                                                          *ChapaIntro*
+1. Intro                                 
 ==============================================================================
 
 After trying other plugins that were supposed to achieve this objective (and 
@@ -22,7 +22,7 @@ Python Class or Function.
 No need to have VIM compiled with Python support since this plugin uses 
 pure VIM syntax.
 
-2. Usage                                                          *ChapaUsage*
+2. Usage                                
 ==============================================================================
 
 Straightforward (for now). Chapa has 2 public calls that you can map to 
@@ -38,7 +38,7 @@ visual block until indentation no longer applies.
 If the requested search (function or class) is not found, the call simply 
 returns and nothing should happen.
 
-3. License                                                      *ChapaLicense*
+3. License                             
 ==============================================================================
 
 MIT
@@ -62,16 +62,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-4. Bugs                                                            *ChapaBugs*
+4. Bugs                               
 ==============================================================================
 
 If you find a bug please post it on the issue tracker:
 https://github.com/alfredodeza/chapa.vim/issues
 
-5. Credits                                                      *ChapaCredits*
+5. Credits                           
 ==============================================================================
 
 A lot of the code for this plugin was adapted/copied from python.vim 
 and python_fn.vim authored by Jon Franklin and Mikael Berthe. 
 
-==============================================================================
