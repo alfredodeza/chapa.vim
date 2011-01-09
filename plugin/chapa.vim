@@ -16,12 +16,15 @@ endif
 
 " In certain situations, it allows you to echo something without 
 " having to hit Return again to do exec the command.
+" It looks if the global message variable is set or set to 0 or set to 1
 function! s:Echo(msg)
-  let x=&ruler | let y=&showcmd
-  set noruler noshowcmd
-  redraw
-  echo a:msg
-  let &ruler=x | let &showcmd=y
+  if (! exists('g:chapa_messages') || exists('g:chapa_messages') && g:chapa_messages)
+    let x=&ruler | let y=&showcmd
+    set noruler noshowcmd
+    redraw
+    echo a:msg
+    let &ruler=x | let &showcmd=y
+  endif
 endfun
 
 "}}}
@@ -97,9 +100,16 @@ function! s:FindPythonObject(obj, direction)
   endif
   let result = search(objregexp, flag)
   if result
-      return line('.') 
+    return line('.') 
   else 
-      return 
+    if (a:direction == -1)
+      let movement = "previous "
+    else
+      let movement = "next "
+    endif
+    let message = "Match not found for " . movement . a:obj
+    call s:Echo(message)
+    return 
   endif
 endfunction
 "}}}
