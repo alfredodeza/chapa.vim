@@ -32,16 +32,13 @@ endfun
 "{{{ Main Functions 
 
 " Select an object ("class"/"function")
-function! s:PythonSelectObject(obj)
+function! s:PythonSelectObject(obj, direction)
   " Go to the object declaration
   normal $
-  let rev = s:FindPythonObject(a:obj, -1)
-  if (! rev)
-    let fwd = s:FindPythonObject(a:obj, 1)
-    if (! fwd)
-      return
-     endif
-   endif
+  let go_to_obj = s:FindPythonObject(a:obj, a:direction)
+  if (! go_to_obj)
+    return
+  endif
 
   let beg = line('.')
   exec beg
@@ -117,9 +114,17 @@ endfunction
 "}}}
 
 "{{{ Misc 
-" Visual Mode Selection
-command! -nargs=0 ChapaVisualFunction call s:PythonSelectObject("function")
-command! -nargs=0 ChapaVisualClass call s:PythonSelectObject("class")
+" Visual Select Class 
+command! -nargs=0 ChapaVisualNextClass call s:PythonSelectObject("class", 1)
+command! -nargs=0 ChapaVisualPreviousClass call s:PythonSelectObject("class", -1)
+
+" Visual Select Function 
+command! -nargs=0 ChapaVisualNextFunction call s:PythonSelectObject("function", 1)
+command! -nargs=0 ChapaVisualPreviousFunction call s:PythonSelectObject("function", -1)
+
+" Visual Select Method
+command! -nargs=0 ChapaVisualNextMethod call s:PythonSelectObject("method", 1)
+command! -nargs=0 ChapaVisualPreviousMethod call s:PythonSelectObject("method", -1)
 
 " Method movement
 command! -nargs=0 ChapaPreviousMethod call s:FindPythonObject("method", -1)
