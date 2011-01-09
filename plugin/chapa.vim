@@ -86,6 +86,8 @@ function! s:FindPythonObject(obj, direction)
   if (a:obj == "class")
     let objregexp = "^\\s*class\\s\\+[a-zA-Z0-9_]\\+"
         \ . "\\s*\\((\\([a-zA-Z0-9_,. \\t\\n]\\)*)\\)\\=\\s*:"
+  elseif (a:obj == "method")
+    let objregexp = "^\\s*def\\s\\+[a-zA-Z0-9_]\\+\\s*(\\s*self\\_[^:#]*)\\s*:"
   else
     let objregexp = "^\\s*def\\s\\+[a-zA-Z0-9_]\\+\\s*(\\_[^:#]*)\\s*:"
   endif
@@ -105,4 +107,6 @@ endfunction
 "{{{ Misc 
 command! -nargs=0 ChapaVisualFunction call s:PythonSelectObject("function")
 command! -nargs=0 ChapaVisualClass call s:PythonSelectObject("class")
+command! -nargs=0 ChapaPreviousMethod call s:FindPythonObject("method", -1)
+command! -nargs=0 ChapaNextMethod call s:FindPythonObject("method", 1)
 "}}}
