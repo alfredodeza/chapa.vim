@@ -124,6 +124,7 @@ endfunction
 "command! -nargs=0 ChapaVisualNextClass call s:PythonSelectObject("class", 1)
 "command! -nargs=0 ChapaVisualPreviousClass call s:PythonSelectObject("class", -1)
 nnoremap <silent> <Plug>ChapaVisualNextClass :<C-U>call <SID>FindPythonObject("class", 1)<CR>
+
 nnoremap <silent> <Plug>ChapaVisualPreviousClass :<C-U>call <SID>FindPythonObject("class", -1)<CR>
 
 " Visual Select Function 

@@ -35,24 +35,24 @@ You can map those callables to anything you want, but below is how the
 author maps them (better mnemonics):
 
 " Function Movement
-nnoremap fpf <Esc>:ChapaNextFunction<CR>
-nnoremap Fpf <Esc>:ChapaPreviousFunction<CR>
+nnoremap fpf <Plug>ChapaNextFunction
+nnoremap Fpf <Plug>ChapaPreviousFunction
 
 " Class Movement
-nnoremap fpc <Esc>:ChapaNextClass<CR>
-nnoremap Fpc <Esc>:ChapaPreviousClass<CR>
+nnoremap fpc <Plug>ChapaNextClass
+nnoremap Fpc <Plug>ChapaPreviousClass
 
 " Method Movement
-nnoremap fpm <Esc>:ChapaNextMethod<CR>
-nnoremap Fpm <Esc>:ChapaPreviousMethod<CR>
+nnoremap fpm <Plug>ChapaNextMethod
+nnoremap Fpm <Plug>ChapaPreviousMethod
 
 " Class Visual Select
-nnoremap vapf <Esc>:ChapaVisualNextFunction<CR>
-nnoremap vapF <Esc>:ChapaVisualPreviousFunction<CR>
+nnoremap vapf <Plug>ChapaVisualNextFunction
+nnoremap vapF <Plug>ChapaVisualPreviousFunction
 
 " Method Visual Select
-nnoremap vapm <Esc>:ChapaVisualNextMethod<CR>
-nnoremap vapM <Esc>:ChapaVisualPreviousMethod<CR>
+nnoremap vapm <Plug>ChapaVisualNextMethod
+nnoremap vapM <Plug>ChapaVisualPreviousMethod
 
 If the requested search (function, class or method) is not found, the call simply 
 returns and nothing should happen. However, there is an error message that should 
@@ -62,6 +62,11 @@ direction.
 You can disable this by adding a chapa-specific variable in your vimrc: 
 
 let g:chapa_messages = 0
+
+You can also add a "count" to repeat the match N times. So if you want to go 
+to 3 previous classes you would (with the mappings above) do something like:
+
+3Fpc
 
 ==============================================================================
 3. License                                                      *ChapaLicense*
