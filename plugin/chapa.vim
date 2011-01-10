@@ -90,8 +90,10 @@ function! s:FindPythonObject(obj, direction)
     let objregexp = "^\\s*def\\s\\+[a-zA-Z0-9_]\\+\\s*(\\s*self\\_[^:#]*)\\s*:"
   else
     " Relaxes the original RegExp to be able to match a bit more easier 
-    " orig regexp: "^\\s*def\\s\\+[a-zA-Z0-9_]\\+\\s*(\\_[^:#]*)\\s*:"
-    let objregexp = "^\\s*def\\s\\+[a-zA-Z0-9_]\\+"
+    " looks for a line starting with def (with space) that does not include 
+    " a `self` in it.
+    " orig regexp:  "^\\s*def\\s\\+[a-zA-Z0-9_]\\+\\s*(\\_[^:#]*)\\s*:"
+    let objregexp = '\v^(.*def )&(.*self)@!'
   endif
   let flag = "W"
   if (a:direction == -1)
