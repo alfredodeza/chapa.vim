@@ -16,9 +16,6 @@ makes dealing with VIM plugins way easier.
 After trying other plugins that were supposed to achieve this objective (and 
 fail) I decided to write it on my own. 
 
-The initial approach is to be able to simply have a visual selection of a 
-Python Class or Function.
-
 No need to have VIM compiled with Python support since this plugin uses 
 pure VIM syntax.
 
