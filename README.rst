@@ -1,8 +1,8 @@
 Chapa
 =====
-A very simple VIM plugin to visually select a Function or a Class
+Allows you to move to previous/next class, function or method 
 
-Simple approach to visual selection of Python blocks.
+or visually select the next/previous class, function or method. 
 
 Installation couldn't be easier: drop the plugin file in your vim plugin 
 directory.
