@@ -46,11 +46,13 @@ nnoremap Fpc <Esc>:ChapaPreviousClass<CR>
 nnoremap fpm <Esc>:ChapaNextMethod<CR>
 nnoremap Fpm <Esc>:ChapaPreviousMethod<CR>
 
-" Method Visual Select 
-nnoremap vapc <Esc>:ChapaVisualClass<CR>
-
 " Class Visual Select
-nnoremap vapf <Esc>:ChapaVisualFunction<CR>
+nnoremap vapf <Esc>:ChapaVisualNextFunction<CR>
+nnoremap vapF <Esc>:ChapaVisualPreviousFunction<CR>
+
+" Method Visual Select
+nnoremap vapm <Esc>:ChapaVisualNextMethod<CR>
+nnoremap vapM <Esc>:ChapaVisualPreviousMethod<CR>
 
 If the requested search (function, class or method) is not found, the call simply 
 returns and nothing should happen. However, there is an error message that should 
