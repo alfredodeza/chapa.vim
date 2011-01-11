@@ -28,26 +28,37 @@ anything you want.
 You can map those callables to anything you want, but below is how the 
 author maps them (better mnemonics)::
 
-  " Function Movement
-  nnoremap fpf <Plug>ChapaNextFunction
-  nnoremap Fpf <Plug>ChapaPreviousFunction
+    " Function Movement
+    nmap fpf <Plug>ChapaNextFunction
+    nmap Fpf <Plug>ChapaPreviousFunction
 
-  " Class Movement
-  nnoremap fpc <Plug>ChapaNextClass
-  nnoremap Fpc <Plug>ChapaPreviousClass
+    " Class Movement
+    nmap fpc <Plug>ChapaNextClass
+    nmap Fpc <Plug>ChapaPreviousClass
 
-  " Method Movement
-  nnoremap fpm <Plug>ChapaNextMethod
-  nnoremap Fpm <Plug>ChapaPreviousMethod
+    " Method Movement
+    nmap fpm <Plug>ChapaNextMethod
+    nmap Fpm <Plug>ChapaPreviousMethod
 
-  " Class Visual Select
-  nnoremap vapf <Plug>ChapaVisualNextFunction
-  nnoremap vapF <Plug>ChapaVisualPreviousFunction
+    " Method Visual Select 
+    nmap vac <Plug>ChapaVisualNextClass
+    nmap vic <Plug>ChapaVisualPreviousClass 
+    nmap vaC <Plug>ChapaVisualPreviousClass
 
-  " Method Visual Select
-  nnoremap vapm <Plug>ChapaVisualNextMethod
-  nnoremap vapM <Plug>ChapaVisualPreviousMethod
+    " Class Visual Select
+    nmap vaf <Plug>ChapaVisualNextFunction
+    nmap vif <Plug>ChapaVisualPreviousFunction
+    nmap vaF <Plug>ChapaVisualPreviousFunction
 
+    " Method Visual Select
+    nmap vam <Plug>ChapaVisualNextMethod
+    nmap vim <Plug>ChapaVisualPreviousMethod
+    nmap vaM <Plug>ChapaVisualPreviousMethod
+
+If you catched it, some of them are repeated: when inside a class, method or 
+function you would want to search the previous match, so ``vic`` that means 
+"visually select inside class" you actually want the previous instance of 
+the class that is (most of the time) correct if you are within a class.
 
 If the requested search (function, class or method) is not found, the call simply 
 returns and nothing should happen. However, there is an error message that should 
