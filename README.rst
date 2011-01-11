@@ -74,6 +74,11 @@ to 3 previous classes you would (with the mappings above) do something like::
 
   3Fpc
 
+The same applies for visual selections. If you want to visually select the 3rd
+next method, you would do it like::
+
+  3vam
+
 3. License                             
 ==============================================================================
 
