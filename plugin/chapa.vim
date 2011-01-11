@@ -7,7 +7,7 @@
 "
 "============================================================================
 
-if exists("g:loaded_chapa") || &cp && &filetype == "html"
+if exists("g:loaded_chapa") || &cp 
   finish
 endif
 
@@ -120,38 +120,26 @@ endfunction
 
 "{{{ Misc 
 " Visual Select Class 
-"command! -nargs=0 ChapaVisualNextClass call s:PythonSelectObject("class", 1)
-"command! -nargs=0 ChapaVisualPreviousClass call s:PythonSelectObject("class", -1)
 nnoremap <silent> <Plug>ChapaVisualNextClass :<C-U>call <SID>PythonSelectObject("class", 1, v:count1)<CR>
 nnoremap <silent> <Plug>ChapaVisualPreviousClass :<C-U>call <SID>PythonSelectObject("class", -1, v:count1)<CR>
 
 " Visual Select Function 
-"command! -nargs=0 ChapaVisualNextFunction call s:PythonSelectObject("function", 1)
-"command! -nargs=0 ChapaVisualPreviousFunction call s:PythonSelectObject("function", -1)
 nnoremap <silent> <Plug>ChapaVisualNextFunction :<C-U>call <SID>PythonSelectObject("function", 1, v:count1)<CR>
 nnoremap <silent> <Plug>ChapaVisualPreviousFunction :<C-U>call <SID>PythonSelectObject("function", -1, v:count1)<CR>
 
 " Visual Select Method
-"command! -nargs=0 ChapaVisualNextMethod call s:PythonSelectObject("method", 1)
-"command! -nargs=0 ChapaVisualPreviousMethod call s:PythonSelectObject("method", -1)
 nnoremap <silent> <Plug>ChapaVisualNextMethod :<C-U>call <SID>PythonSelectObject("method", 1, v:count1)<CR>
 nnoremap <silent> <Plug>ChapaVisualPreviousMethod :<C-U>call <SID>PythonSelectObject("method", -1, v:count1)<CR>
 
 " Method movement
-"command! -nargs=0 ChapaPreviousMethod call s:FindPythonObject("method", -1)
-"command! -nargs=0 ChapaNextMethod call s:FindPythonObject("method", 1)
 nnoremap <silent> <Plug>ChapaPreviousMethod :<C-U>call <SID>FindPythonObject("method", -1, v:count1)<CR>
 nnoremap <silent> <Plug>ChapaNextMethod :<C-U>call <SID>FindPythonObject("method", 1, v:count1)<CR>
 
 " Class movement
-"command! -nargs=0 ChapaPreviousClass call s:FindPythonObject("class", -1)
-"command! -nargs=0 ChapaNextClass call s:FindPythonObject("class", 1)
 nnoremap <silent> <Plug>ChapaPreviousClass :<C-U>call <SID>FindPythonObject("class", -1, v:count1)<CR>
 nnoremap <silent> <Plug>ChapaNextClass :<C-U>call <SID>FindPythonObject("class", 1, v:count1)<CR>
 
 " Function movement
-"command! -nargs=0 ChapaPreviousFunction <C-U>call s:FindPythonObject("function", -1, v:count1)
-"command! -nargs=0 ChapaNextFunction <C-U>call s:FindPythonObject("function", 1, v:count1)
 nnoremap <silent> <Plug>ChapaPreviousFunction :<C-U>call <SID>FindPythonObject("function", -1, v:count1)<CR>
 nnoremap <silent> <Plug>ChapaNextFunction :<C-U>call <SID>FindPythonObject("function", 1, v:count1)<CR>
 "}}}
