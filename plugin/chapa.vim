@@ -32,10 +32,14 @@ endfun
 
 " Select an object ("class"/"function")
 function! s:PythonSelectObject(obj, direction, count)
+let orig_line = line('.')
+let orig_col = col('.')
   " Go to the object declaration
   normal $
   let go_to_obj = s:FindPythonObject(a:obj, a:direction, a:count)
   if (! go_to_obj)
+    exec orig_line
+    exe "normal " orig_col . "|"
     return
   endif
 
@@ -99,6 +103,8 @@ endfunction
 " Functions Forwards:
 "     :call FindPythonObject("function")
 function! s:FindPythonObject(obj, direction, count)
+let orig_line = line('.')
+let orig_col = col('.')
   if (a:obj == "class")
     let objregexp = "^\\s*class\\s\\+[a-zA-Z0-9_]\\+"
         \ . "\\s*\\((\\([a-zA-Z0-9_,. \\t\\n]\\)*)\\)\\=\\s*:"
@@ -129,6 +135,8 @@ function! s:FindPythonObject(obj, direction, count)
       let movement = "next "
     endif
     let message = "Match not found for " . movement . a:obj
+    exec orig_line
+    exe "normal " orig_col . "|"
     call s:Echo(message)
     return 
   endif
