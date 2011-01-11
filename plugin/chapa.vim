@@ -63,20 +63,27 @@ endfunction
 
 
 function! s:NextIndent(fwd)
-  let line = line('.')
-  let column = col('.')
-  let lastline = line('$')
-  let indent = indent(line)
-  let stepvalue = a:fwd ? 1 : -1
+    let line = line('.')
+    let column = col('.')
+    let lastline = line('$')
+    let indent = indent(line)
+    let stepvalue = a:fwd ? 1 : -1
 
-  echo indent(line)
-  while (line > 0 && line <= lastline)
-    let line = line + stepvalue
+    " We look for the last non whitespace 
+    " line (e.g. another function at same indent level
+    " and then go back until we find an indent that 
+    " matches what we are looking for
+    while (line > 0 && line <= lastline)
+        let line = line + stepvalue
 
-    if (indent(line) <= indent && getline(line) !~ '^\s*$')
-      return line - 2
-    endif
-  endwhile
+        if (indent(line) <= indent && getline(line) !~ '^\s*$')
+            let line = line -1 
+            while (indent(line) <= indent)
+                let line = line -1 
+            endwhile
+            return line 
+        endif
+    endwhile
 endfunction
  
 
