@@ -43,6 +43,7 @@ function! s:PythonSelectObject(obj, direction, count)
   exec beg
 
   let until = s:NextIndent(1)
+  return
   let line_moves = until - beg
   
   if line_moves > 0
@@ -63,7 +64,7 @@ function! s:NextIndent(fwd)
   while (line > 0 && line <= lastline)
     let line = line + stepvalue
 
-    if (indent(line) <= indent && strlen(getline(line)) > 0)
+    if (indent(line) <= indent && getline(line) !~ '^\s*$')
       return line - 1
     endif
   endwhile
