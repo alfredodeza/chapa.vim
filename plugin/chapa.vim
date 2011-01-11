@@ -39,11 +39,19 @@ function! s:PythonSelectObject(obj, direction, count)
     return
   endif
 
-  let beg = line('.')
-  exec beg
+  " Sometimes, when we get a decorator we are not in the line we want 
+  let has_decorator = s:HasPythonDecorator(line('.'))
+
+  if has_decorator 
+    let beg = has_decorator 
+  else 
+    let beg = line('.')
+  endif
 
   let until = s:NextIndent(1)
-  return
+
+  " go to the line we need
+  exec beg
   let line_moves = until - beg
   
   if line_moves > 0
@@ -61,11 +69,12 @@ function! s:NextIndent(fwd)
   let indent = indent(line)
   let stepvalue = a:fwd ? 1 : -1
 
+  echo indent(line)
   while (line > 0 && line <= lastline)
     let line = line + stepvalue
 
     if (indent(line) <= indent && getline(line) !~ '^\s*$')
-      return line - 1
+      return line - 2
     endif
   endwhile
 endfunction
@@ -105,7 +114,7 @@ function! s:FindPythonObject(obj, direction, count)
     let _count = _count - 1
   endwhile
   if result
-    return line('.') 
+        return line('.') 
   else 
     if (a:direction == -1)
       let movement = "previous "
@@ -116,6 +125,13 @@ function! s:FindPythonObject(obj, direction, count)
     call s:Echo(message)
     return 
   endif
+endfunction
+
+function! s:HasPythonDecorator(line)
+    let line = a:line -1 
+    if (getline(line) =~ '\v^(.*\@[a-zA-Z])')
+        return line 
+    endif
 endfunction
 "}}}
 
