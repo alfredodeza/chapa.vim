@@ -1,4 +1,3 @@
-"============================================================================
 " File:        chapa.vim
 " Description: vim plugin to visually select Python functions or classes
 " Maintainer:  Alfredo Deza <alfredodeza AT gmail.com>
@@ -8,7 +7,7 @@
 "
 "============================================================================
 
-if exists("g:loaded_chapa") || &cp
+if exists("g:loaded_chapa") || &cp && &filetype == "html"
   finish
 endif
 
@@ -32,10 +31,10 @@ endfun
 "{{{ Main Functions 
 
 " Select an object ("class"/"function")
-function! s:PythonSelectObject(obj, direction)
+function! s:PythonSelectObject(obj, direction, count)
   " Go to the object declaration
   normal $
-  let go_to_obj = s:FindPythonObject(a:obj, a:direction)
+  let go_to_obj = s:FindPythonObject(a:obj, a:direction, a:count)
   if (! go_to_obj)
     return
   endif
@@ -123,21 +122,20 @@ endfunction
 " Visual Select Class 
 "command! -nargs=0 ChapaVisualNextClass call s:PythonSelectObject("class", 1)
 "command! -nargs=0 ChapaVisualPreviousClass call s:PythonSelectObject("class", -1)
-nnoremap <silent> <Plug>ChapaVisualNextClass :<C-U>call <SID>FindPythonObject("class", 1)<CR>
-
-nnoremap <silent> <Plug>ChapaVisualPreviousClass :<C-U>call <SID>FindPythonObject("class", -1)<CR>
+nnoremap <silent> <Plug>ChapaVisualNextClass :<C-U>call <SID>PythonSelectObject("class", 1, v:count1)<CR>
+nnoremap <silent> <Plug>ChapaVisualPreviousClass :<C-U>call <SID>PythonSelectObject("class", -1, v:count1)<CR>
 
 " Visual Select Function 
 "command! -nargs=0 ChapaVisualNextFunction call s:PythonSelectObject("function", 1)
 "command! -nargs=0 ChapaVisualPreviousFunction call s:PythonSelectObject("function", -1)
-nnoremap <silent> <Plug>ChapaVisualNextFunction :<C-U>call <SID>FindPythonObject("function", 1)<CR>
-nnoremap <silent> <Plug>ChapaVisualPreviousFunction :<C-U>call <SID>FindPythonObject("function", -1)<CR>
+nnoremap <silent> <Plug>ChapaVisualNextFunction :<C-U>call <SID>PythonSelectObject("function", 1, v:count1)<CR>
+nnoremap <silent> <Plug>ChapaVisualPreviousFunction :<C-U>call <SID>PythonSelectObject("function", -1, v:count1)<CR>
 
 " Visual Select Method
 "command! -nargs=0 ChapaVisualNextMethod call s:PythonSelectObject("method", 1)
 "command! -nargs=0 ChapaVisualPreviousMethod call s:PythonSelectObject("method", -1)
-nnoremap <silent> <Plug>ChapaNextMethod :<C-U>call <SID>FindPythonObject("method", 1)<CR>
-nnoremap <silent> <Plug>ChapaPreviousMethod :<C-U>call <SID>FindPythonObject("method", -1)<CR>
+nnoremap <silent> <Plug>ChapaVisualNextMethod :<C-U>call <SID>PythonSelectObject("method", 1, v:count1)<CR>
+nnoremap <silent> <Plug>ChapaVisualPreviousMethod :<C-U>call <SID>PythonSelectObject("method", -1, v:count1)<CR>
 
 " Method movement
 "command! -nargs=0 ChapaPreviousMethod call s:FindPythonObject("method", -1)
