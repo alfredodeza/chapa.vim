@@ -31,13 +31,20 @@ endfun
 "{{{ Main Functions 
 
 " Select an object ("class"/"function")
-function! s:PythonSelectObject(obj, direction, count)
+function! s:PythonSelectObject(obj, direction, count, ...)
     let orig_line = line('.')
     let orig_col = col('.')
 
     " Go to the object declaration
     normal $
-    let go_to_obj = s:FindPythonObject(a:obj, a:direction, a:count)
+    if (a:0 >= 1)
+        let inside = "inside"
+    else
+        let inside = ""
+    endif
+    
+    let go_to_obj = s:FindPythonObject(a:obj, a:direction, a:count, inside)
+        
     if (! go_to_obj)
         exec orig_line
         exe "normal " orig_col . "|"
@@ -103,7 +110,8 @@ endfunction
 "     :call FindPythonObject("function", -1)
 " Functions Forwards:
 "     :call FindPythonObject("function")
-function! s:FindPythonObject(obj, direction, count)
+function! s:FindPythonObject(obj, direction, count, ...)
+let inside = a:1
 let orig_line = line('.')
 let orig_col = col('.')
   if (a:obj == "class")
@@ -130,10 +138,12 @@ let orig_col = col('.')
   if result
         return line('.') 
   else 
-    if (a:direction == -1)
-      let movement = "previous "
-    else
-      let movement = "next "
+      if (inside == "inside")
+          let movement = "inside "
+      elseif (a:direction == -1)
+          let movement = "previous "
+      elseif (a:direction == 1)
+          let movement = "next "
     endif
     let message = "Match not found for " . movement . a:obj
     exec orig_line
@@ -165,15 +175,18 @@ endfunction
 "{{{ Misc 
 " Visual Select Class 
 nnoremap <silent> <Plug>ChapaVisualNextClass :<C-U>call <SID>PythonSelectObject("class", 1, v:count1)<CR>
-nnoremap <silent> <Plug>ChapaVisualPreviousClass :<C-U>call <SID>PythonSelectObject("class", -1, v:count1)<CR>
+nnoremap <silent> <Plug>ChapaVisualPreviousClass :<C-U>call <SID>PythonSelectObject("class", -1, v:count1+1)<CR>
+nnoremap <silent> <Plug>ChapaVisualInsideClass :<C-U>call <SID>PythonSelectObject("class", -1, 1, "inside")<CR>
 
 " Visual Select Function 
 nnoremap <silent> <Plug>ChapaVisualNextFunction :<C-U>call <SID>PythonSelectObject("function", 1, v:count1)<CR>
-nnoremap <silent> <Plug>ChapaVisualPreviousFunction :<C-U>call <SID>PythonSelectObject("function", -1, v:count1)<CR>
+nnoremap <silent> <Plug>ChapaVisualPreviousFunction :<C-U>call <SID>PythonSelectObject("function", -1, v:count1+1)<CR>
+nnoremap <silent> <Plug>ChapaVisualInsideFunction :<C-U>call <SID>PythonSelectObject("function", -1, 1, "inside")<CR>
 
 " Visual Select Method
 nnoremap <silent> <Plug>ChapaVisualNextMethod :<C-U>call <SID>PythonSelectObject("method", 1, v:count1)<CR>
-nnoremap <silent> <Plug>ChapaVisualPreviousMethod :<C-U>call <SID>PythonSelectObject("method", -1, v:count1)<CR>
+nnoremap <silent> <Plug>ChapaVisualPreviousMethod :<C-U>call <SID>PythonSelectObject("method", -1, v:count1+1)<CR>
+nnoremap <silent> <PLug>ChapaVisualInsideMethod :<C-U>call <SID>PythonSelectObject("method", -1, 1, "inside")<CR>
 
 " Method movement
 nnoremap <silent> <Plug>ChapaPreviousMethod :<C-U>call <SID>FindPythonObject("method", -1, v:count1)<CR>
