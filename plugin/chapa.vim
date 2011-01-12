@@ -31,19 +31,13 @@ endfun
 "{{{ Main Functions 
 
 " Select an object ("class"/"function")
-function! s:PythonSelectObject(obj, direction, count, ...)
+function! s:PythonSelectObject(obj, direction, count)
     let orig_line = line('.')
     let orig_col = col('.')
 
     " Go to the object declaration
     normal $
-    if (a:0 >= 1)
-        let inside = "inside"
-    else
-        let inside = ""
-    endif
-    
-    let go_to_obj = s:FindPythonObject(a:obj, a:direction, a:count, inside)
+    let go_to_obj = s:FindPythonObject(a:obj, a:direction, a:count)
         
     if (! go_to_obj)
         exec orig_line
@@ -110,8 +104,7 @@ endfunction
 "     :call FindPythonObject("function", -1)
 " Functions Forwards:
 "     :call FindPythonObject("function")
-function! s:FindPythonObject(obj, direction, count, ...)
-let inside = a:1
+function! s:FindPythonObject(obj, direction, count)
 let orig_line = line('.')
 let orig_col = col('.')
   if (a:obj == "class")
@@ -138,11 +131,9 @@ let orig_col = col('.')
   if result
         return line('.') 
   else 
-      if (inside == "inside")
-          let movement = "inside "
-      elseif (a:direction == -1)
+      if (a:direction == -1)
           let movement = "previous "
-      elseif (a:direction == 1)
+      else
           let movement = "next "
     endif
     let message = "Match not found for " . movement . a:obj
@@ -172,21 +163,43 @@ function! s:HasPythonDecorator(line)
 endfunction
 "}}}
 
+"{{{ Proxy Functions 
+function! s:VisualNextClass()
+    if (! s:PythonSelectObject("class", 1, v:count1))
+        call s:Echo("Could not match next class for visual selection")
+    endif
+endfunction
+
+function! s:VisualPreviousClass()
+    if (! s:PythonSelectObject("class", -1, v:count1+1))
+        call s:Echo("Could not match previous class for visual selection")
+    endif 
+endfunction
+
+function! s:VisualThisClass()
+    if (! s:PythonSelectObject("class", -1, 1))
+        call s:Echo("Could not match inside of class for visual selection")
+    endif 
+endfunction
+"}}}
 "{{{ Misc 
 " Visual Select Class 
-nnoremap <silent> <Plug>ChapaVisualNextClass :<C-U>call <SID>PythonSelectObject("class", 1, v:count1)<CR>
-nnoremap <silent> <Plug>ChapaVisualPreviousClass :<C-U>call <SID>PythonSelectObject("class", -1, v:count1+1)<CR>
-nnoremap <silent> <Plug>ChapaVisualInsideClass :<C-U>call <SID>PythonSelectObject("class", -1, 1, "inside")<CR>
+nnoremap <silent> <Plug>ChapaVisualNextClass :<C-U>call <SID>VisualNextClass()<CR>
+nnoremap <silent> <Plug>ChapaVisualPreviousClass :<C-U>call <SID>VisualPreviousClass()<CR>
+nnoremap <silent> <Plug>ChapaVisualThisClass :<C-U>call <SID>VisualThisClass()<CR>
+"nnoremap <silent> <Plug>ChapaVisualNextClass :<C-U>call <SID>PythonSelectObject("class", 1, v:count1)<CR>
+"nnoremap <silent> <Plug>ChapaVisualPreviousClass :<C-U>call <SID>PythonSelectObject("class", -1, v:count1+1)<CR>
+"nnoremap <silent> <Plug>ChapaVisualThisClass :<C-U>call <SID>PythonSelectObject("class", -1, 1, "inside")<CR>
 
 " Visual Select Function 
 nnoremap <silent> <Plug>ChapaVisualNextFunction :<C-U>call <SID>PythonSelectObject("function", 1, v:count1)<CR>
 nnoremap <silent> <Plug>ChapaVisualPreviousFunction :<C-U>call <SID>PythonSelectObject("function", -1, v:count1+1)<CR>
-nnoremap <silent> <Plug>ChapaVisualInsideFunction :<C-U>call <SID>PythonSelectObject("function", -1, 1, "inside")<CR>
+nnoremap <silent> <Plug>ChapaVisualThisFunction :<C-U>call <SID>PythonSelectObject("function", -1, 1)<CR>
 
 " Visual Select Method
 nnoremap <silent> <Plug>ChapaVisualNextMethod :<C-U>call <SID>PythonSelectObject("method", 1, v:count1)<CR>
 nnoremap <silent> <Plug>ChapaVisualPreviousMethod :<C-U>call <SID>PythonSelectObject("method", -1, v:count1+1)<CR>
-nnoremap <silent> <PLug>ChapaVisualInsideMethod :<C-U>call <SID>PythonSelectObject("method", -1, 1, "inside")<CR>
+nnoremap <silent> <PLug>ChapaVisualThisMethod :<C-U>call <SID>PythonSelectObject("method", -1, 1)<CR>
 
 " Method movement
 nnoremap <silent> <Plug>ChapaPreviousMethod :<C-U>call <SID>FindPythonObject("method", -1, v:count1)<CR>
