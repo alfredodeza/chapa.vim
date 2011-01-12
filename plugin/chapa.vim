@@ -32,37 +32,38 @@ endfun
 
 " Select an object ("class"/"function")
 function! s:PythonSelectObject(obj, direction, count)
-let orig_line = line('.')
-let orig_col = col('.')
-  " Go to the object declaration
-  normal $
-  let go_to_obj = s:FindPythonObject(a:obj, a:direction, a:count)
-  if (! go_to_obj)
-    exec orig_line
-    exe "normal " orig_col . "|"
-    return
-  endif
+    let orig_line = line('.')
+    let orig_col = col('.')
 
-  " Sometimes, when we get a decorator we are not in the line we want 
-  let has_decorator = s:HasPythonDecorator(line('.'))
+    " Go to the object declaration
+    normal $
+    let go_to_obj = s:FindPythonObject(a:obj, a:direction, a:count)
+    if (! go_to_obj)
+        exec orig_line
+        exe "normal " orig_col . "|"
+        return
+    endif
 
-  if has_decorator 
-    let beg = has_decorator 
-  else 
-    let beg = line('.')
-  endif
+    " Sometimes, when we get a decorator we are not in the line we want 
+    let has_decorator = s:HasPythonDecorator(line('.'))
 
-  let until = s:NextIndent(1)
+    if has_decorator 
+        let beg = has_decorator 
+    else 
+        let beg = line('.')
+    endif
 
-  " go to the line we need
-  exec beg
-  let line_moves = until - beg
-  
-  if line_moves > 0
-    execute "normal V" . line_moves . "j"
-  else
-    execute "normal VG" 
-  endif
+    let until = s:NextIndent(1)
+
+    " go to the line we need
+    exec beg
+    let line_moves = until - beg
+
+    if line_moves > 0
+        execute "normal V" . line_moves . "j"
+    else
+        execute "normal VG" 
+    endif
 endfunction
 
 
@@ -141,6 +142,7 @@ let orig_col = col('.')
     return 
   endif
 endfunction
+
 
 function! s:HasPythonDecorator(line)
     " Get to the previous line where the decorator lives
