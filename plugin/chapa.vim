@@ -143,9 +143,19 @@ let orig_col = col('.')
 endfunction
 
 function! s:HasPythonDecorator(line)
+    " Get to the previous line where the decorator lives
     let line = a:line -1 
+    while (getline(line) =~ '\v^(.*\@[a-zA-Z])')
+        let line = line - 1
+    endwhile
+
+    " This is tricky but goes back and forth to 
+    " correctly match the decorator without the 
+    " possibility of selecting a blank line
     if (getline(line) =~ '\v^(.*\@[a-zA-Z])')
-        return line 
+        return line
+    elseif (getline(line+1) =~ '\v^(.*\@[a-zA-Z])')
+        return line + 1
     endif
 endfunction
 "}}}
