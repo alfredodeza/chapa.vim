@@ -277,6 +277,59 @@ function! s:HasPythonDecorator(line)
         return line + 1
     endif
 endfunction
+
+function! s:IsInside(object)
+    let beg = line('.')
+    let column = col('.')
+    " Verifies you are actually inside 
+    " of the object you are referring to 
+    let class = s:PreviousObjectLine("class")
+    let method = s:PreviousObjectLine("method")
+    let function = s:PreviousObjectLine("function")
+
+    exe beg 
+    exe "normal " column . "|"
+
+    if (a:object == "function")
+        if ((class < function) && (method < function))
+            return 1
+        else 
+            return 0 
+        endif 
+    elseif (a:object == "class")
+        if ((function < class) && (method < class))
+            return 1
+        else 
+            return 0 
+        endif 
+    elseif (a:object == "method")
+        if ((function < method) && (class < method))
+            return 1
+        else 
+            return 0
+        endif 
+    endif 
+endfunction 
+
+function! s:PreviousObjectLine(obj)
+    if (a:obj == "class")
+        let objregexp  = '\v^\s*(.*class)\s+(\w+)\s*\(\s*'
+    elseif (a:obj == "method")
+        let objregexp = '\v^\s*(.*def)\s+(\w+)\s*\(\s*(self[^)]*)'
+    else
+        let objregexp = '\v^\s*(.*def)\s+(\w+)\s*\(\s*(.*self)@!'
+    endif
+
+    let flag = 'Wb' 
+
+    let result = search(objregexp, flag)
+    if result
+        return line('.')
+    else 
+        return 0
+    endif
+
+endfunction
 "}}}
 
 "{{{ Proxy Functions 
@@ -286,7 +339,13 @@ endfunction
 " Comment Class Selections:
 "
 function! s:CommentPreviousClass()
-    if (! s:PythonCommentObject("class", -1, v:count1+1))
+    let inside = s:IsInside("class")
+    if (inside == 1)
+        let times = v:count1+1
+    else 
+        let times = v:count1 
+    endif
+    if (! s:PythonCommentObject("class", -1, times))
         call s:Echo("Could not match previous class for commenting")
     endif 
 endfunction
@@ -307,7 +366,13 @@ endfunction
 " Comment Method Selections:
 "
 function! s:CommentPreviousMethod()
-    if (! s:PythonCommentObject("method", -1, v:count1+1))
+    let inside = s:IsInside("method")
+    if (inside == 1)
+        let times = v:count1+1
+    else 
+        let times = v:count1 
+    endif
+    if (! s:PythonCommentObject("method", -1, times))
         call s:Echo("Could not match previous method for commenting")
     endif 
 endfunction
@@ -328,7 +393,13 @@ endfunction
 " Comment Function Selections:
 "
 function! s:CommentPreviousFunction()
-    if (! s:PythonCommentObject("function", -1, v:count1+1))
+    let inside = s:IsInside("function")
+    if (inside == 1)
+        let times = v:count1+1
+    else 
+        let times = v:count1 
+    endif
+    if (! s:PythonCommentObject("function", -1, times))
         call s:Echo("Could not match previous function for commenting")
     endif 
 endfunction
@@ -356,7 +427,13 @@ function! s:VisualNextClass()
 endfunction
 
 function! s:VisualPreviousClass()
-    if (! s:PythonSelectObject("class", -1, v:count1+1))
+    let inside = s:IsInside("class")
+    if (inside == 1)
+        let times = v:count1+1
+    else 
+        let times = v:count1 
+    endif
+    if (! s:PythonSelectObject("class", -1, times))
         call s:Echo("Could not match previous class for visual selection")
     endif 
 endfunction
@@ -376,7 +453,13 @@ function! s:VisualNextFunction()
 endfunction
 
 function! s:VisualPreviousFunction()
-    if (! s:PythonSelectObject("function", -1, v:count1+1))
+    let inside = s:IsInside("function")
+    if (inside == 1)
+        let times = v:count1+1
+    else 
+        let times = v:count1 
+    endif
+    if (! s:PythonSelectObject("function", -1, times))
         call s:Echo("Could not match previous function for visual selection")
     endif 
 endfunction
@@ -395,7 +478,13 @@ function! s:VisualNextMethod()
 endfunction
 
 function! s:VisualPreviousMethod()
-    if (! s:PythonSelectObject("method", -1, v:count1+1))
+    let inside = s:IsInside("method")
+    if (inside == 1)
+        let times = v:count1+1
+    else 
+        let times = v:count1 
+    endif
+    if (! s:PythonSelectObject("method", -1, times))
         call s:Echo("Could not match previous method for visual selection")
     endif 
 endfunction
@@ -411,7 +500,13 @@ endfunction
 " 
 " Class:
 function! s:PreviousClass()
-    if (! s:FindPythonObject("class", -1, v:count1))
+    let inside = s:IsInside("class")
+    if (inside == 1)
+        let times = v:count1+1
+    else 
+        let times = v:count1 
+    endif
+    if (! s:FindPythonObject("class", -1, times))
         call s:Echo("Could not match previous class")
     endif 
 endfunction 
@@ -424,7 +519,13 @@ endfunction
 
 " Method:
 function! s:PreviousMethod()
-    if (! s:FindPythonObject("method", -1, v:count1))
+    let inside = s:IsInside("method")
+    if (inside == 1)
+        let times = v:count1+1
+    else 
+        let times = v:count1 
+    endif
+    if (! s:FindPythonObject("method", -1, times))
         call s:Echo("Could not match previous method")
     endif 
 endfunction 
@@ -437,7 +538,13 @@ endfunction
 
 " Function:
 function! s:PreviousFunction()
-    if (! s:FindPythonObject("function", -1, v:count1))
+    let inside = s:IsInside("function")
+    if (inside == 1)
+        let times = v:count1+1
+    else 
+        let times = v:count1 
+    endif
+    if (! s:FindPythonObject("function", -1, times))
         call s:Echo("Could not match previous function")
     endif 
 endfunction
