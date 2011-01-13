@@ -105,13 +105,42 @@ function! s:PythonCommentObject(obj, direction, count)
     exec beg
     let line_moves = until - beg
 
-    if line_moves > 0
-        execute beg . "," . until . " s/^/#"
+    " check if we have comments or not 
+    let has_comments = s:HasComments(beg, until)
+    if (has_comments == 1)
+        let regex = " s/^#//"
+        let until = s:LastComment(beg)
     else
-        execute "%s/^/#" 
+        let regex = " s/^/#/"
+    endif
+        
+    if line_moves > 0
+        execute beg . "," . until . regex
+    else
+        execute "%" . regex
     endif
     let @/ = ""
     return 1
+endfunction
+
+" Find if a Range has comments or not 
+function! s:HasComments(from, until)
+    let regex =  's/^#//gn'
+    try 
+        silent exe a:from . "," . a:until . regex
+        return 1
+    catch /^Vim\%((\a\+)\)\=:E/
+        return 0
+    endtry
+endfunction
+
+" Find the last commented line 
+function! s:LastComment(from_line)
+    let line = a:from_line
+    while ((getline(line) =~ '^\s*#') && (line <= line('$')))
+        let line = line+1
+    endwhile 
+    return line 
 endfunction
 
 " Select an object ("class"/"function")
@@ -207,16 +236,11 @@ function! s:FindPythonObject(obj, direction, count)
     let orig_line = line('.')
     let orig_col = col('.')
     if (a:obj == "class")
-        let objregexp = "^\\s*class\\s\\+[a-zA-Z0-9_]\\+"
-        \ . "\\s*\\((\\([a-zA-Z0-9_,. \\t\\n]\\)*)\\)\\=\\s*:"
+        let objregexp  = '\v^\s*(.*class)\s+(\w+)\s*\(\s*'
     elseif (a:obj == "method")
-        let objregexp = "^\\s*def\\s\\+[a-zA-Z0-9_]\\+\\s*(\\s*self\\_[^:#]*)\\s*:"
+        let objregexp = '\v^\s*(.*def)\s+(\w+)\s*\(\s*(self[^)]*)'
     else
-    " Relaxes the original RegExp to be able to match a bit more easier 
-    " looks for a line starting with def (with space) that does not include 
-    " a `self` in it.
-    " orig regexp:  "^\\s*def\\s\\+[a-zA-Z0-9_]\\+\\s*(\\_[^:#]*)\\s*:"
-    let objregexp = '\v^(.*def )&(.*self)@!'
+        let objregexp = '\v^\s*(.*def)\s+(\w+)\s*\(\s*(.*self)@!'
     endif
     let flag = "W"
     if (a:direction == -1)
