@@ -78,18 +78,25 @@ function! s:NextIndent(fwd)
     " We look for the last non whitespace 
     " line (e.g. another function at same indent level
     " and then go back until we find an indent that 
-    " matches what we are looking for
-    while (line > 0 && line <= lastline)
-        let line = line + stepvalue
+    " matches what we are looking for that is NOT whitespace
+    let found = 0
+    while ((line > 0) && (line <= lastline) && (found == 0))
+        let line = line + 1
 
-        if (indent(line) <= indent && getline(line) !~ '^\s*$')
-            let line = line -1 
-            while (indent(line) <= indent)
-                let line = line -1 
+        if ((indent(line) <= indent) && (getline(line) !~ '^\s*$'))
+            let go_back = line -1 
+            while (getline(go_back) =~ '^\s*$')
+                let go_back = go_back-1 
+                if (getline(go_back) !~ '^\s*$')
+                    break 
+                    let found = 1
+                endif
             endwhile
-            return line 
+            return go_back 
         endif
     endwhile
+
+    "        return line
 endfunction
  
 
@@ -105,43 +112,36 @@ endfunction
 " Functions Forwards:
 "     :call FindPythonObject("function")
 function! s:FindPythonObject(obj, direction, count)
-let orig_line = line('.')
-let orig_col = col('.')
-  if (a:obj == "class")
-    let objregexp = "^\\s*class\\s\\+[a-zA-Z0-9_]\\+"
+    let orig_line = line('.')
+    let orig_col = col('.')
+    if (a:obj == "class")
+        let objregexp = "^\\s*class\\s\\+[a-zA-Z0-9_]\\+"
         \ . "\\s*\\((\\([a-zA-Z0-9_,. \\t\\n]\\)*)\\)\\=\\s*:"
-  elseif (a:obj == "method")
-    let objregexp = "^\\s*def\\s\\+[a-zA-Z0-9_]\\+\\s*(\\s*self\\_[^:#]*)\\s*:"
-  else
+    elseif (a:obj == "method")
+        let objregexp = "^\\s*def\\s\\+[a-zA-Z0-9_]\\+\\s*(\\s*self\\_[^:#]*)\\s*:"
+    else
     " Relaxes the original RegExp to be able to match a bit more easier 
     " looks for a line starting with def (with space) that does not include 
     " a `self` in it.
     " orig regexp:  "^\\s*def\\s\\+[a-zA-Z0-9_]\\+\\s*(\\_[^:#]*)\\s*:"
     let objregexp = '\v^(.*def )&(.*self)@!'
-  endif
-  let flag = "W"
-  if (a:direction == -1)
-    let flag = flag."b"
-  endif
-  let _count = a:count
-  while _count > 0
-    let result = search(objregexp, flag)
-    let _count = _count - 1
-  endwhile
-  if result
-        return line('.') 
-  else 
-      if (a:direction == -1)
-          let movement = "previous "
-      else
-          let movement = "next "
     endif
-    let message = "Match not found for " . movement . a:obj
-    exec orig_line
-    exe "normal " orig_col . "|"
-    call s:Echo(message)
-    return 
-  endif
+    let flag = "W"
+    if (a:direction == -1)
+        let flag = flag."b"
+    endif
+    let _count = a:count
+    let matched_search = 0
+    while _count > 0
+        let result = search(objregexp, flag)
+        if result 
+            let matched_search = result 
+        endif
+        let _count = _count - 1
+    endwhile
+    if (matched_search != 0)
+        return matched_search
+    endif
 endfunction
 
 
@@ -164,6 +164,10 @@ endfunction
 "}}}
 
 "{{{ Proxy Functions 
+"
+" Visual Selections:
+"
+" Visual Class Selections:
 function! s:VisualNextClass()
     if (! s:PythonSelectObject("class", 1, v:count1))
         call s:Echo("Could not match next class for visual selection")
@@ -181,35 +185,113 @@ function! s:VisualThisClass()
         call s:Echo("Could not match inside of class for visual selection")
     endif 
 endfunction
+
+" Visual Function Selections:
+function! s:VisualNextFunction()
+    if (! s:PythonSelectObject("function", 1, v:count1))
+        call s:Echo("Could not match next function for visual selection")
+    endif
+endfunction
+
+function! s:VisualPreviousFunction()
+    if (! s:PythonSelectObject("function", -1, v:count1+1))
+        call s:Echo("Could not match previous function for visual selection")
+    endif 
+endfunction
+
+function! s:VisualThisFunction()
+    if (! s:PythonSelectObject("function", -1, 1))
+        call s:Echo("Could not match inside of function for visual selection")
+    endif 
+endfunction
+
+" Visual Method Selections:
+function! s:VisualNextMethod()
+    if (! s:PythonSelectObject("method", 1, v:count1))
+        call s:Echo("Could not match next method for visual selection")
+    endif
+endfunction
+
+function! s:VisualPreviousMethod()
+    if (! s:PythonSelectObject("method", -1, v:count1+1))
+        call s:Echo("Could not match previous method for visual selection")
+    endif 
+endfunction
+
+function! s:VisualThisMethod()
+    if (! s:PythonSelectObject("method", -1, 1))
+        call s:Echo("Could not match inside of method for visual selection")
+    endif 
+endfunction
+
+" 
+" Movements:
+" 
+" Class:
+function! s:PreviousClass()
+    if (! s:FindPythonObject("class", -1, v:count1))
+        call s:Echo("Could not match previous class")
+    endif 
+endfunction 
+
+function! s:NextClass()
+    if (! s:FindPythonObject("class", 1, v:count1))
+        call s:Echo("Could not match next class")
+    endif 
+endfunction 
+
+" Method:
+function! s:PreviousMethod()
+    if (! s:FindPythonObject("method", -1, v:count1))
+        call s:Echo("Could not match previous method")
+    endif 
+endfunction 
+
+function! s:NextMethod()
+    if (! s:FindPythonObject("method", 1, v:count1))
+        call s:Echo("Could not match next method")
+    endif 
+endfunction 
+
+" Function:
+function! s:PreviousFunction()
+    if (! s:FindPythonObject("function", -1, v:count1))
+        call s:Echo("Could not match previous function")
+    endif 
+endfunction
+        
+function! s:NextFunction()
+    if (! s:FindPythonObject("function", 1, v:count1))
+        call s:Echo("Could not match next function")
+    endif 
+endfunction
 "}}}
+
 "{{{ Misc 
-" Visual Select Class 
-nnoremap <silent> <Plug>ChapaVisualNextClass :<C-U>call <SID>VisualNextClass()<CR>
-nnoremap <silent> <Plug>ChapaVisualPreviousClass :<C-U>call <SID>VisualPreviousClass()<CR>
-nnoremap <silent> <Plug>ChapaVisualThisClass :<C-U>call <SID>VisualThisClass()<CR>
-"nnoremap <silent> <Plug>ChapaVisualNextClass :<C-U>call <SID>PythonSelectObject("class", 1, v:count1)<CR>
-"nnoremap <silent> <Plug>ChapaVisualPreviousClass :<C-U>call <SID>PythonSelectObject("class", -1, v:count1+1)<CR>
-"nnoremap <silent> <Plug>ChapaVisualThisClass :<C-U>call <SID>PythonSelectObject("class", -1, 1, "inside")<CR>
+" Visual Select Class:
+nnoremap <silent> <Plug>ChapaVisualNextClass        :<C-U>call <SID>VisualNextClass()       <CR>
+nnoremap <silent> <Plug>ChapaVisualPreviousClass    :<C-U>call <SID>VisualPreviousClass()   <CR>
+nnoremap <silent> <Plug>ChapaVisualThisClass        :<C-U>call <SID>VisualThisClass()       <CR>
 
-" Visual Select Function 
-nnoremap <silent> <Plug>ChapaVisualNextFunction :<C-U>call <SID>PythonSelectObject("function", 1, v:count1)<CR>
-nnoremap <silent> <Plug>ChapaVisualPreviousFunction :<C-U>call <SID>PythonSelectObject("function", -1, v:count1+1)<CR>
-nnoremap <silent> <Plug>ChapaVisualThisFunction :<C-U>call <SID>PythonSelectObject("function", -1, 1)<CR>
+" Visual Select Method:
+nnoremap <silent> <Plug>ChapaVisualNextMethod       :<C-U>call <SID>VisualNextMethod()      <CR>
+nnoremap <silent> <Plug>ChapaVisualPreviousMethod   :<C-U>call <SID>VisualPreviousMethod()  <CR>
+nnoremap <silent> <PLug>ChapaVisualThisMethod       :<C-U>call <SID>VisualThisMethod()      <CR>
 
-" Visual Select Method
-nnoremap <silent> <Plug>ChapaVisualNextMethod :<C-U>call <SID>PythonSelectObject("method", 1, v:count1)<CR>
-nnoremap <silent> <Plug>ChapaVisualPreviousMethod :<C-U>call <SID>PythonSelectObject("method", -1, v:count1+1)<CR>
-nnoremap <silent> <PLug>ChapaVisualThisMethod :<C-U>call <SID>PythonSelectObject("method", -1, 1)<CR>
+" Visual Select Function:
+nnoremap <silent> <Plug>ChapaVisualNextFunction     :<C-U>call <SID>VisualNextFunction()    <CR>
+nnoremap <silent> <Plug>ChapaVisualPreviousFunction :<C-U>call <SID>VisualPreviousFunction()<CR>
+nnoremap <silent> <Plug>ChapaVisualThisFunction     :<C-U>call <SID>VisualThisFunction()    <CR>
 
-" Method movement
-nnoremap <silent> <Plug>ChapaPreviousMethod :<C-U>call <SID>FindPythonObject("method", -1, v:count1)<CR>
-nnoremap <silent> <Plug>ChapaNextMethod :<C-U>call <SID>FindPythonObject("method", 1, v:count1)<CR>
+" Class Movement:
+nnoremap <silent> <Plug>ChapaPreviousClass          :<C-U>call <SID>PreviousClass()         <CR>
+nnoremap <silent> <Plug>ChapaNextClass              :<C-U>call <SID>NextClass()             <CR>
 
-" Class movement
-nnoremap <silent> <Plug>ChapaPreviousClass :<C-U>call <SID>FindPythonObject("class", -1, v:count1)<CR>
-nnoremap <silent> <Plug>ChapaNextClass :<C-U>call <SID>FindPythonObject("class", 1, v:count1)<CR>
+" Method Movement:
+nnoremap <silent> <Plug>ChapaPreviousMethod         :<C-U>call <SID>PreviousMethod()        <CR>
+nnoremap <silent> <Plug>ChapaNextMethod             :<C-U>call <SID>NextMethod()            <CR>
 
-" Function movement
-nnoremap <silent> <Plug>ChapaPreviousFunction :<C-U>call <SID>FindPythonObject("function", -1, v:count1)<CR>
-nnoremap <silent> <Plug>ChapaNextFunction :<C-U>call <SID>FindPythonObject("function", 1, v:count1)<CR>
+" Function Movement:
+nnoremap <silent> <Plug>ChapaPreviousFunction       :<C-U>call <SID>PreviousFunction()      <CR>
+nnoremap <silent> <Plug>ChapaNextFunction           :<C-U>call <SID>NextFunction()          <CR>
 "}}}
