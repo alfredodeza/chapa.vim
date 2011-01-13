@@ -1,5 +1,6 @@
 " File:        chapa.vim
-" Description: vim plugin to visually select Python functions or classes
+" Description: Go to or visually select the next/previous class, method or
+"              function in Python.
 " Maintainer:  Alfredo Deza <alfredodeza AT gmail.com>
 " License:     MIT
 " Notes:       A lot of the code within was adapted/copied from python.vim 
@@ -29,6 +30,44 @@ endfun
 "}}}
 
 "{{{ Main Functions 
+" Range for commenting 
+function! s:PythonCommentObject(obj, direction, count)
+    let orig_line = line('.')
+    let orig_col = col('.')
+
+    " Go to the object declaration
+    normal $
+    let go_to_obj = s:FindPythonObject(a:obj, a:direction, a:count)
+        
+    if (! go_to_obj)
+        exec orig_line
+        exe "normal " orig_col . "|"
+        return
+    endif
+
+    " Sometimes, when we get a decorator we are not in the line we want 
+    let has_decorator = s:HasPythonDecorator(line('.'))
+
+    if has_decorator 
+        let beg = has_decorator 
+    else 
+        let beg = line('.')
+    endif
+
+    let until = s:NextIndent(1)
+
+    " go to the line we need
+    exec beg
+    let line_moves = until - beg
+
+    if line_moves > 0
+        execute beg . "," . until . " s/^/#"
+    else
+        execute "%s/^/#" 
+    endif
+    let @/ = ""
+    return 1
+endfunction
 
 " Select an object ("class"/"function")
 function! s:PythonSelectObject(obj, direction, count)
@@ -173,6 +212,71 @@ endfunction
 
 "{{{ Proxy Functions 
 "
+" Commenting Selections
+"
+" Comment Class Selections:
+"
+function! s:CommentPreviousClass()
+    if (! s:PythonCommentObject("class", -1, v:count1+1))
+        call s:Echo("Could not match previous class for commenting")
+    endif 
+endfunction
+
+function! s:CommentNextClass()
+    if (! s:PythonCommentObject("class", 1, v:count1))
+        call s:Echo("Could not match next class for commenting")
+    endif 
+endfunction
+
+function! s:CommentThisClass()
+    if (! s:PythonCommentObject("class", -1, 1))
+        call s:Echo("Could not match inside of class for commenting")
+    endif 
+endfunction
+
+"
+" Comment Method Selections:
+"
+function! s:CommentPreviousMethod()
+    if (! s:PythonCommentObject("method", -1, v:count1+1))
+        call s:Echo("Could not match previous method for commenting")
+    endif 
+endfunction
+
+function! s:CommentNextMethod()
+    if (! s:PythonCommentObject("method", 1, v:count1))
+        call s:Echo("Could not match next method for commenting")
+    endif 
+endfunction
+
+function! s:CommentThisMethod()
+    if (! s:PythonCommentObject("method", -1, 1))
+        call s:Echo("Could not match inside of method for commenting")
+    endif 
+endfunction
+
+"
+" Comment Function Selections:
+"
+function! s:CommentPreviousFunction()
+    if (! s:PythonCommentObject("function", -1, v:count1+1))
+        call s:Echo("Could not match previous function for commenting")
+    endif 
+endfunction
+
+function! s:CommentNextFunction()
+    if (! s:PythonCommentObject("function", 1, v:count1))
+        call s:Echo("Could not match next function for commenting")
+    endif 
+endfunction
+
+function! s:CommentThisFunction()
+    if (! s:PythonCommentObject("function", -1, 1))
+        call s:Echo("Could not match inside of function for commenting")
+    endif 
+endfunction
+
+"
 " Visual Selections:
 "
 " Visual Class Selections:
@@ -193,6 +297,7 @@ function! s:VisualThisClass()
         call s:Echo("Could not match inside of class for visual selection")
     endif 
 endfunction
+
 
 " Visual Function Selections:
 function! s:VisualNextFunction()
@@ -276,6 +381,21 @@ endfunction
 "}}}
 
 "{{{ Misc 
+" Comment Class: 
+nnoremap <silent> <Plug>ChapaCommentPreviousClass   :<C-U>call <SID>CommentPreviousClass() <CR>
+nnoremap <silent> <Plug>ChapaCommentNextClass       :<C-U>call <SID>CommentNextClass()     <CR>
+nnoremap <silent> <Plug>ChapaCommentThisClass       :<C-U>call <SID>CommentThisClass()     <CR>
+
+" Comment Method: 
+nnoremap <silent> <Plug>ChapaCommentPreviousMethod   :<C-U>call <SID>CommentPreviousMethod()<CR>
+nnoremap <silent> <Plug>ChapaCommentNextMethod       :<C-U>call <SID>CommentNextMethod()    <CR>
+nnoremap <silent> <Plug>ChapaCommentThisMethod       :<C-U>call <SID>CommentThisMethod()    <CR>
+
+" Comment Function: 
+nnoremap <silent> <Plug>ChapaCommentPreviousFunction   :<C-U>call <SID>CommentPreviousFunction()  <CR>
+nnoremap <silent> <Plug>ChapaCommentNextFunction       :<C-U>call <SID>CommentNextFunction()      <CR>
+nnoremap <silent> <Plug>ChapaCommentThisFunction       :<C-U>call <SID>CommentThisFunction()      <CR>
+
 " Visual Select Class:
 nnoremap <silent> <Plug>ChapaVisualNextClass        :<C-U>call <SID>VisualNextClass()       <CR>
 nnoremap <silent> <Plug>ChapaVisualPreviousClass    :<C-U>call <SID>VisualPreviousClass()   <CR>
