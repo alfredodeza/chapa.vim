@@ -12,6 +12,51 @@ if exists("g:loaded_chapa") || &cp
   finish
 endif
 
+"{{{ Default Mappings 
+if (exists('g:chapa_default_mappings'))
+    " Function Movement
+    nmap fpf <Plug>ChapaNextFunction
+    nmap Fpf <Plug>ChapaPreviousFunction
+
+    " Class Movement
+    nmap fpc <Plug>ChapaNextClass
+    nmap Fpc <Plug>ChapaPreviousClass
+
+    " Method Movement
+    nmap fpm <Plug>ChapaNextMethod
+    nmap Fpm <Plug>ChapaPreviousMethod
+
+    " Class Visual Select 
+    nmap vanc <Plug>ChapaVisualNextClass
+    nmap vic <Plug>ChapaVisualThisClass 
+    nmap vapc <Plug>ChapaVisualPreviousClass
+
+    " Method Visual Select
+    nmap vanm <Plug>ChapaVisualNextMethod
+    nmap vim <Plug>ChapaVisualThisMethod
+    nmap vapm <Plug>ChapaVisualPreviousMethod
+
+    " Function Visual Select
+    nmap vanf <Plug>ChapaVisualNextFunction
+    nmap vif <Plug>ChapaVisualThisFunction
+    nmap vapf <Plug>ChapaVisualPreviousFunction
+
+    " Comment Class
+    nmap cic <Plug>ChapaCommentThisClass
+    nmap cnc <Plug>ChapaCommentNextClass
+    nmap cpc <Plug>ChapaCommentPreviousClass
+
+    " Comment Method 
+    nmap cim <Plug>ChapaCommentThisMethod 
+    nmap cnm <Plug>ChapaCommentNextMethod 
+    nmap cpm <Plug>ChapaCommentPreviousMethod 
+
+    " Comment Function 
+    nmap cif <Plug>ChapaCommentThisFunction
+    nmap cnf <Plug>ChapaCommentNextFunction
+    nmap cpf <Plug>ChapaCommentPreviousFunction
+endif
+
 "{{{ Helpers
 
 " In certain situations, it allows you to echo something without 
