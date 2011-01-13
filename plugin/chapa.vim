@@ -93,10 +93,18 @@ function! s:NextIndent(fwd)
                 endif
             endwhile
             return go_back 
+
+        " what if we reach end of file and no dice? 
+        elseif (line == lastline)
+            while (getline(line) =~ '^\s*$')
+                let line = line-1 
+                if (getline(line) !~ '^\s*$')
+                    break 
+                endif
+            endwhile
+            return line
         endif
     endwhile
-
-    "        return line
 endfunction
  
 
