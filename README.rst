@@ -1,8 +1,10 @@
 Chapa
 =====
-Allows you to move to previous/next class, function or method 
+Allows you to move to previous/next N class, function or method 
 
-or visually select the next/previous class, function or method. 
+or visually select the next/previous N class, function or method 
+
+or comment out the next/previous N class, function or method.
 
 Installation couldn't be easier: drop the plugin file in your vim plugin 
 directory.
@@ -22,43 +24,61 @@ pure VIM syntax.
 2. Usage                                
 ==============================================================================
 
-Straightforward (for now). Chapa has 8 public calls that you can map to 
-anything you want. 
+There are a couple of routes you can take: with or without default mappings.
+
+If you want to define your own mappings then no need to do anything else other 
+than know the actual plugin calls (listed below).
+
+If you want the default mappings (also listed below) you need to add this to 
+your vimrc::
+
+    let g:chapa_default_mappings = 1
 
 You can map those callables to anything you want, but below is how the 
-author maps them (better mnemonics)::
+defaults are mapped::
 
-    " Function Movement
-    nmap fpf <Plug>ChapaNextFunction
-    nmap Fpf <Plug>ChapaPreviousFunction
+   " Class Movement
+   nmap fpc <Plug>ChapaNextClass
+   nmap Fpc <Plug>ChapaPreviousClass
 
-    " Class Movement
-    nmap fpc <Plug>ChapaNextClass
-    nmap Fpc <Plug>ChapaPreviousClass
+   " Method Movement
+   nmap fpm <Plug>ChapaNextMethod
+   nmap Fpm <Plug>ChapaPreviousMethod
 
-    " Method Movement
-    nmap fpm <Plug>ChapaNextMethod
-    nmap Fpm <Plug>ChapaPreviousMethod
+   " Function Movement
+   nmap fpf <Plug>ChapaNextFunction
+   nmap Fpf <Plug>ChapaPreviousFunction
 
-    " Method Visual Select 
-    nmap vac <Plug>ChapaVisualNextClass
-    nmap vic <Plug>ChapaVisualPreviousClass 
-    nmap vaC <Plug>ChapaVisualPreviousClass
+   " Class Visual Select 
+   nmap vanc <Plug>ChapaVisualNextClass
+   nmap vic <Plug>ChapaVisualThisClass 
+   nmap vapc <Plug>ChapaVisualPreviousClass
 
-    " Class Visual Select
-    nmap vaf <Plug>ChapaVisualNextFunction
-    nmap vif <Plug>ChapaVisualPreviousFunction
-    nmap vaF <Plug>ChapaVisualPreviousFunction
+   " Method Visual Select
+   nmap vanm <Plug>ChapaVisualNextMethod
+   nmap vim <Plug>ChapaVisualThisMethod
+   nmap vapm <Plug>ChapaVisualPreviousMethod
 
-    " Method Visual Select
-    nmap vam <Plug>ChapaVisualNextMethod
-    nmap vim <Plug>ChapaVisualPreviousMethod
-    nmap vaM <Plug>ChapaVisualPreviousMethod
+   " Function Visual Select
+   nmap vanf <Plug>ChapaVisualNextFunction
+   nmap vif <Plug>ChapaVisualThisFunction
+   nmap vapf <Plug>ChapaVisualPreviousFunction
 
-If you catched it, some of them are repeated: when inside a class, method or 
-function you would want to search the previous match, so ``vic`` that means 
-"visually select inside class" you actually want the previous instance of 
-the class that is (most of the time) correct if you are within a class.
+   " Comment Class
+   nmap cic <Plug>ChapaCommentThisClass
+   nmap cnc <Plug>ChapaCommentNextClass
+   nmap cpc <Plug>ChapaCommentPreviousClass
+
+   " Comment Method 
+   nmap cim <Plug>ChapaCommentThisMethod 
+   nmap cnm <Plug>ChapaCommentNextMethod 
+   nmap cpm <Plug>ChapaCommentPreviousMethod 
+
+   " Comment Function 
+   nmap cif <Plug>ChapaCommentThisFunction
+   nmap cnf <Plug>ChapaCommentNextFunction
+   nmap cpf <Plug>ChapaCommentPreviousFunction
+
 
 If the requested search (function, class or method) is not found, the call simply 
 returns and nothing should happen. However, there is an error message that should 
@@ -70,14 +90,14 @@ You can disable this by adding a chapa-specific variable in your vimrc::
   let g:chapa_messages = 0
 
 You can also add a "count" to repeat the match N times. So if you want to go 
-to 3 previous classes you would (with the mappings above) do something like::
+to the 3rd previous class you would (with the mappings above) do something like::
 
   3Fpc
 
 The same applies for visual selections. If you want to visually select the 3rd
 next method, you would do it like::
 
-  3vam
+  3vanm
 
 3. License                             
 ==============================================================================
