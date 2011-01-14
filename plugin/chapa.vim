@@ -278,13 +278,21 @@ function! s:FindPythonObject(obj, direction, count)
     endif
     let _count = a:count
     let matched_search = 0
-    while _count > 0
+    if (count == 0)
         let result = search(objregexp, flag)
         if result 
             let matched_search = result 
         endif
-        let _count = _count - 1
-    endwhile
+
+    else    
+        while _count > 0
+            let result = search(objregexp, flag)
+            if result 
+                let matched_search = result 
+            endif
+            let _count = _count - 1
+        endwhile
+    endif
     if (matched_search != 0)
         return matched_search
     endif
@@ -317,23 +325,33 @@ function! s:IsInside(object)
     let method = s:PreviousObjectLine("method")
     let function = s:PreviousObjectLine("function")
 
+    echo "class " . class 
+    echo "method " . method 
+    echo "function " . function
     exe beg 
     exe "normal " column . "|"
 
     if (a:object == "function")
-        if ((class < function) && (method < function))
+        if (function == -1)
+            echo "returning -1"
+            return -1
+        elseif ((class < function) && (method < function))
             return 1
         else 
             return 0 
         endif 
     elseif (a:object == "class")
-        if ((function < class) && (method < class))
+        if (class == -1)
+            return -1
+        elseif ((function < class) && (method < class))
             return 1
         else 
             return 0 
         endif 
     elseif (a:object == "method")
-        if ((function < method) && (class < method))
+        if (method == -1)
+            return -1
+        elseif ((function < method) && (class < method))
             return 1
         else 
             return 0
@@ -352,11 +370,17 @@ function! s:PreviousObjectLine(obj)
 
     let flag = 'Wb' 
 
-    let result = search(objregexp, flag)
-    if result
-        return line('.')
-    else 
-        return 0
+    " are we on THE actual beginning of the object? 
+    if (getline('.') =~ objregexp)
+        return -1
+    else
+        let result = search(objregexp, flag)
+        if result
+            echo "do not get executred"
+            return line('.')
+        else 
+            return 0
+        endif
     endif
 
 endfunction
@@ -370,11 +394,7 @@ endfunction
 "
 function! s:CommentPreviousClass()
     let inside = s:IsInside("class")
-    if (inside == 1)
-        let times = v:count1+1
-    else 
-        let times = v:count1 
-    endif
+    let times = v:count1+inside
     if (! s:PythonCommentObject("class", -1, times))
         call s:Echo("Could not match previous class for commenting")
     endif 
@@ -397,11 +417,7 @@ endfunction
 "
 function! s:CommentPreviousMethod()
     let inside = s:IsInside("method")
-    if (inside == 1)
-        let times = v:count1+1
-    else 
-        let times = v:count1 
-    endif
+    let times = v:count1+inside
     if (! s:PythonCommentObject("method", -1, times))
         call s:Echo("Could not match previous method for commenting")
     endif 
@@ -424,11 +440,7 @@ endfunction
 "
 function! s:CommentPreviousFunction()
     let inside = s:IsInside("function")
-    if (inside == 1)
-        let times = v:count1+1
-    else 
-        let times = v:count1 
-    endif
+    let times = v:count1+inside
     if (! s:PythonCommentObject("function", -1, times))
         call s:Echo("Could not match previous function for commenting")
     endif 
@@ -458,11 +470,7 @@ endfunction
 
 function! s:VisualPreviousClass()
     let inside = s:IsInside("class")
-    if (inside == 1)
-        let times = v:count1+1
-    else 
-        let times = v:count1 
-    endif
+    let times = v:count1+inside
     if (! s:PythonSelectObject("class", -1, times))
         call s:Echo("Could not match previous class for visual selection")
     endif 
@@ -484,11 +492,7 @@ endfunction
 
 function! s:VisualPreviousFunction()
     let inside = s:IsInside("function")
-    if (inside == 1)
-        let times = v:count1+1
-    else 
-        let times = v:count1 
-    endif
+    let times = v:count1+inside
     if (! s:PythonSelectObject("function", -1, times))
         call s:Echo("Could not match previous function for visual selection")
     endif 
@@ -509,11 +513,7 @@ endfunction
 
 function! s:VisualPreviousMethod()
     let inside = s:IsInside("method")
-    if (inside == 1)
-        let times = v:count1+1
-    else 
-        let times = v:count1 
-    endif
+    let times = v:count1+inside
     if (! s:PythonSelectObject("method", -1, times))
         call s:Echo("Could not match previous method for visual selection")
     endif 
@@ -531,11 +531,7 @@ endfunction
 " Class:
 function! s:PreviousClass()
     let inside = s:IsInside("class")
-    if (inside == 1)
-        let times = v:count1+1
-    else 
-        let times = v:count1 
-    endif
+    let times = v:count1+inside
     if (! s:FindPythonObject("class", -1, times))
         call s:Echo("Could not match previous class")
     endif 
@@ -550,11 +546,7 @@ endfunction
 " Method:
 function! s:PreviousMethod()
     let inside = s:IsInside("method")
-    if (inside == 1)
-        let times = v:count1+1
-    else 
-        let times = v:count1 
-    endif
+    let times = v:count1+inside
     if (! s:FindPythonObject("method", -1, times))
         call s:Echo("Could not match previous method")
     endif 
@@ -570,11 +562,7 @@ endfunction
 function! s:PreviousFunction()
     let g:chapa_last_action = "s:PreviousFunction()"
     let inside = s:IsInside("function")
-    if (inside == 1)
-        let times = v:count1+1
-    else 
-        let times = v:count1 
-    endif
+    let times = v:count1+inside
     if (! s:FindPythonObject("function", -1, times))
         call s:Echo("Could not match previous function")
     endif 
