@@ -56,8 +56,8 @@ if (exists('g:chapa_default_mappings'))
     nmap cnf <Plug>ChapaCommentNextFunction
     nmap cpf <Plug>ChapaCommentPreviousFunction
 
-    nmap <silent> <  :<C-U>call <SID>BackwardRepeat()<CR>
-    nmap <silent> >  :<C-U>call <SID>Repeat()<CR>
+    nmap <silent> <C-h>  :<C-U>call <SID>BackwardRepeat()<CR>
+    nmap <silent> <C-l>  :<C-U>call <SID>Repeat()<CR>
 endif
 
 "{{{ Helpers
