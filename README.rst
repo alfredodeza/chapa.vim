@@ -4,7 +4,7 @@ Allows you to move to previous/next N class, function or method
 
 or visually select the next/previous N class, function or method 
 
-or comment out the next/previous N class, function or method.
+or comment (or toggle) out the next/previous N class, function or method.
 
 Installation couldn't be easier: drop the plugin file in your vim plugin 
 directory.
@@ -16,7 +16,7 @@ makes dealing with VIM plugins way easier.
 ==============================================================================
 
 After trying other plugins that were supposed to achieve this objective (and 
-fail) I decided to write it on my own. 
+fail) I decided to write it on my own.  
 
 No need to have VIM compiled with Python support since this plugin uses 
 pure VIM syntax.
@@ -37,6 +37,10 @@ your vimrc::
 You can map those callables to anything you want, but below is how the 
 defaults are mapped::
 
+   " Function Movement
+   nmap fpf <Plug>ChapaNextFunction
+   nmap Fpf <Plug>ChapaPreviousFunction
+
    " Class Movement
    nmap fpc <Plug>ChapaNextClass
    nmap Fpc <Plug>ChapaPreviousClass
@@ -44,10 +48,6 @@ defaults are mapped::
    " Method Movement
    nmap fpm <Plug>ChapaNextMethod
    nmap Fpm <Plug>ChapaPreviousMethod
-
-   " Function Movement
-   nmap fpf <Plug>ChapaNextFunction
-   nmap Fpf <Plug>ChapaPreviousFunction
 
    " Class Visual Select 
    nmap vanc <Plug>ChapaVisualNextClass
@@ -79,6 +79,9 @@ defaults are mapped::
    nmap cnf <Plug>ChapaCommentNextFunction
    nmap cpf <Plug>ChapaCommentPreviousFunction
 
+   " Last Movement
+   nmap <silent> <C-h>  :<C-U>call <SID>BackwardRepeat()<CR>
+   nmap <silent> <C-l>  :<C-U>call <SID>Repeat()<CR>
 
 If the requested search (function, class or method) is not found, the call simply 
 returns and nothing should happen. However, there is an error message that should 
@@ -98,6 +101,24 @@ The same applies for visual selections. If you want to visually select the 3rd
 next method, you would do it like::
 
   3vanm
+
+You can also toggle comments of a given class, method or function. To comment
+the next class::
+
+  cnc 
+
+If the class is already commented, the command above will remove the comments.
+
+If you are moving around, the plugin allows you to repeat the forward or
+reverse (opposite to the original) move. For example, if you searched for the 
+next function like::
+
+   fpf 
+
+Then ``<C-l>`` repeats that same command for you and moves you in the same 
+direction. If you want to go in the opposite movement, then ``<C-h>`` is your
+friend.
+
 
 3. License                             
 ==============================================================================
