@@ -88,12 +88,12 @@ function! s:Repeat()
 endfunction
 
 function! s:BackwardRepeat()
-    let act_map = {'s:NextClass()' : 's:PreviousClass()',
-                \'s:PreviousClass()' : 's:NextClass()',
-                \'s:NextMethod()' : 's:PreviousMethod()',
-                \'s:PreviousMethod()' : 's:NextMethod()',
-                \'s:NextFunction()' : 's:PreviousFunction()',
-                \'s:PreviousFunction()' : 's:NextFunction()'}
+    let act_map = {'s:NextClass(0)' : 's:PreviousClass(0)',
+                \'s:PreviousClass(0)' : 's:NextClass(0)',
+                \'s:NextMethod(0)' : 's:PreviousMethod(0)',
+                \'s:PreviousMethod(0)' : 's:NextMethod(0)',
+                \'s:NextFunction(0)' : 's:PreviousFunction(0)',
+                \'s:PreviousFunction(0)' : 's:NextFunction(0)'}
     if (exists('g:chapa_last_action'))
         let fwd = g:chapa_last_action 
         let cmd = "call " . act_map[fwd]
@@ -523,7 +523,10 @@ endfunction
 " Movements:
 " 
 " Class:
-function! s:PreviousClass()
+function! s:PreviousClass(record)
+    if (a:record == 1)
+        let g:chapa_last_action = "s:PreviousClass(0)"
+    endif
     let inside = s:IsInside("class")
     let times = v:count1+inside
     if (! s:FindPythonObject("class", -1, times))
@@ -531,14 +534,20 @@ function! s:PreviousClass()
     endif 
 endfunction 
 
-function! s:NextClass()
+function! s:NextClass(record)
+    if (a:record == 1)
+        let g:chapa_last_action = "s:NextClass(0)"
+    endif
     if (! s:FindPythonObject("class", 1, v:count1))
         call s:Echo("Could not match next class")
     endif 
 endfunction 
 
 " Method:
-function! s:PreviousMethod()
+function! s:PreviousMethod(record)
+    if (a:record == 1)
+        let g:chapa_last_action = "s:PreviousMethod(0)"
+    endif
     let inside = s:IsInside("method")
     let times = v:count1+inside
     if (! s:FindPythonObject("method", -1, times))
@@ -546,15 +555,20 @@ function! s:PreviousMethod()
     endif 
 endfunction 
 
-function! s:NextMethod()
+function! s:NextMethod(record)
+    if (a:record == 1)
+        let g:chapa_last_action = "s:NextMethod(0)"
+    endif
     if (! s:FindPythonObject("method", 1, v:count1))
         call s:Echo("Could not match next method")
     endif 
 endfunction 
 
 " Function:
-function! s:PreviousFunction()
-    let g:chapa_last_action = "s:PreviousFunction()"
+function! s:PreviousFunction(record)
+    if (a:record == 1)
+        let g:chapa_last_action = "s:PreviousFunction(0)"
+    endif
     let inside = s:IsInside("function")
     let times = v:count1+inside
     if (! s:FindPythonObject("function", -1, times))
@@ -562,7 +576,10 @@ function! s:PreviousFunction()
     endif 
 endfunction
         
-function! s:NextFunction()
+function! s:NextFunction(record)
+    if (a:record == 1)
+        let g:chapa_last_action = "s:NextFunction(0)"
+    endif
     if (! s:FindPythonObject("function", 1, v:count1))
         call s:Echo("Could not match next function")
     endif 
@@ -601,14 +618,14 @@ nnoremap <silent> <Plug>ChapaVisualPreviousFunction :<C-U>call <SID>VisualPrevio
 nnoremap <silent> <Plug>ChapaVisualThisFunction     :<C-U>call <SID>VisualThisFunction()    <CR>
 
 " Class Movement:
-nnoremap <silent> <Plug>ChapaPreviousClass          :<C-U>call <SID>PreviousClass()         <CR>
-nnoremap <silent> <Plug>ChapaNextClass              :<C-U>call <SID>NextClass()             <CR>
+nnoremap <silent> <Plug>ChapaPreviousClass          :<C-U>call <SID>PreviousClass(1)         <CR>
+nnoremap <silent> <Plug>ChapaNextClass              :<C-U>call <SID>NextClass(1)             <CR>
 
 " Method Movement:
-nnoremap <silent> <Plug>ChapaPreviousMethod         :<C-U>call <SID>PreviousMethod()        <CR>
-nnoremap <silent> <Plug>ChapaNextMethod             :<C-U>call <SID>NextMethod()            <CR>
+nnoremap <silent> <Plug>ChapaPreviousMethod         :<C-U>call <SID>PreviousMethod(1)        <CR>
+nnoremap <silent> <Plug>ChapaNextMethod             :<C-U>call <SID>NextMethod(1)            <CR>
 
 " Function Movement:
-nnoremap <silent> <Plug>ChapaPreviousFunction       :<C-U>call <SID>PreviousFunction()      <CR>
-nnoremap <silent> <Plug>ChapaNextFunction           :<C-U>call <SID>NextFunction()          <CR>
+nnoremap <silent> <Plug>ChapaPreviousFunction       :<C-U>call <SID>PreviousFunction(1)      <CR>
+nnoremap <silent> <Plug>ChapaNextFunction           :<C-U>call <SID>NextFunction(1)          <CR>
 "}}}
