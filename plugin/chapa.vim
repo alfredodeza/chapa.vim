@@ -283,7 +283,6 @@ function! s:FindPythonObject(obj, direction, count)
         if result 
             let matched_search = result 
         endif
-
     else    
         while _count > 0
             let result = search(objregexp, flag)
@@ -325,15 +324,11 @@ function! s:IsInside(object)
     let method = s:PreviousObjectLine("method")
     let function = s:PreviousObjectLine("function")
 
-    echo "class " . class 
-    echo "method " . method 
-    echo "function " . function
     exe beg 
     exe "normal " column . "|"
 
     if (a:object == "function")
         if (function == -1)
-            echo "returning -1"
             return -1
         elseif ((class < function) && (method < function))
             return 1
@@ -376,7 +371,6 @@ function! s:PreviousObjectLine(obj)
     else
         let result = search(objregexp, flag)
         if result
-            echo "do not get executred"
             return line('.')
         else 
             return 0
