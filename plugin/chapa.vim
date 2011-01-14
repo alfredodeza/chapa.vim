@@ -55,6 +55,9 @@ if (exists('g:chapa_default_mappings'))
     nmap cif <Plug>ChapaCommentThisFunction
     nmap cnf <Plug>ChapaCommentNextFunction
     nmap cpf <Plug>ChapaCommentPreviousFunction
+
+    nmap <silent> <  :<C-U>call <SID>BackwardRepeat()<CR>
+    nmap <silent> >  :<C-U>call <SID>Repeat()<CR>
 endif
 
 "{{{ Helpers
@@ -72,6 +75,33 @@ function! s:Echo(msg)
   endif
 endfun
 
+" Wouldn't it be nice if you could just repeat the effing Movements
+" instead of typing mnemonics to keep going forward or backwards?
+" Exactly.
+function! s:Repeat()
+    if (exists('g:chapa_last_action'))
+        let cmd = "call " . g:chapa_last_action 
+        exe cmd
+    else 
+        echo "No command to repeat"
+    endif 
+endfunction
+
+function! s:BackwardRepeat()
+    let act_map = {'s:NextClass()' : 's:PreviousClass()',
+                \'s:PreviousClass()' : 's:NextClass()',
+                \'s:NextMethod()' : 's:PreviousMethod()',
+                \'s:PreviousMethod()' : 's:NextMethod()',
+                \'s:NextFunction()' : 's:PreviousFunction()',
+                \'s:PreviousFunction()' : 's:NextFunction()'}
+    if (exists('g:chapa_last_action'))
+        let fwd = g:chapa_last_action 
+        let cmd = "call " . act_map[fwd]
+        exe cmd
+    else 
+        echo "No opposite command to repeat"
+    endif
+endfunction
 "}}}
 
 "{{{ Main Functions 
@@ -538,6 +568,7 @@ endfunction
 
 " Function:
 function! s:PreviousFunction()
+    let g:chapa_last_action = "s:PreviousFunction()"
     let inside = s:IsInside("function")
     if (inside == 1)
         let times = v:count1+1
