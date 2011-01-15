@@ -138,7 +138,7 @@ function! s:RubyCommentObject(obj, direction, count)
 
     let beg = line('.')
 
-    let until = s:NextEnd(1)
+    let until = s:NextEnd(1, a:obj)
 
     " go to the line we need
     exec beg
@@ -199,7 +199,7 @@ function! s:RubySelectObject(obj, direction, count)
 
     let beg = line('.')
 
-    let until = s:NextEnd(1)
+    let until = s:NextEnd(1, a:obj)
 
     " go to the line we need
     exec beg
@@ -213,21 +213,59 @@ function! s:RubySelectObject(obj, direction, count)
 endfunction
 
 
-function! s:NextEnd(fwd)
+function! s:NextEnd(fwd, obj)
     let line = line('.')
     let column = col('.')
     let lastline = line('$')
-    let indent = indent(line)
     let stepvalue = a:fwd ? 1 : -1
+    
+    if (a:obj == "class")
+        let c_class = 1 
+    else
+        let c_class = 0
+    endif
 
+    if (a:obj == "method")
+        let c_method = 1
+    else
+        let c_method = 0
+    endif
+
+    if (a:obj == "function")
+        let c_function = 1 
+    else
+        let c_function = 0
+    endif
+
+    if (a:obj == "module")
+        let c_module = 1
+    else 
+        let c_module = 0
+    endif
+
+    let c_end = 0
     let found = 0
     let matched = 0
     while ((line > 0) && (line <= lastline) && (found == 0))
         let line = line + 1
-        if (getline(line) =~ '^\s*end\s*')
-            return line
-            let found = 1
+        if (getline(line) =~ '\v^\s*(.*class)\s+(\w+)\s*')
+            let c_class = c_class + 1
+        elseif (getline(line) =~ '\v^\s*(.*def)\s+(self*)\s*')
+            let c_method = c_method + 1
+        elseif (getline(line) =~ '\v^\s*module\s+(\w+)\s*')
+            let c_module = c_module + 1
+        
+        elseif (getline(line) =~ '\v^\s*(.*def)&(.*self)@!')
+            let c_function = c_function + 1
         endif            
+
+        if (getline(line) =~ '^\s*end\s*')
+            let c_end = c_end + 1
+            if (c_class + c_method + c_function + c_module == c_end)
+                return line 
+                let found = 1 
+            endif 
+        endif
     endwhile
 endfunction
  
