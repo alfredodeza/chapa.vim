@@ -56,8 +56,9 @@ if (exists('g:chapa_default_mappings'))
     nmap cnf <Plug>ChapaCommentNextFunction
     nmap cpf <Plug>ChapaCommentPreviousFunction
 
-    nmap <silent> <C-h>  :<C-U>call <SID>BackwardRepeat()<CR>
-    nmap <silent> <C-l>  :<C-U>call <SID>Repeat()<CR>
+    " Repeat Mappings
+    nmap <C-h> <Plug>ChapaOppositeRepeat
+    nmap <C-l> <Plug>ChapaRepeat
 endif
 
 "{{{ Helpers
@@ -624,14 +625,18 @@ nnoremap <silent> <Plug>ChapaVisualPreviousFunction :<C-U>call <SID>VisualPrevio
 nnoremap <silent> <Plug>ChapaVisualThisFunction     :<C-U>call <SID>VisualThisFunction()    <CR>
 
 " Class Movement:
-nnoremap <silent> <Plug>ChapaPreviousClass          :<C-U>call <SID>PreviousClass(1)         <CR>
-nnoremap <silent> <Plug>ChapaNextClass              :<C-U>call <SID>NextClass(1)             <CR>
+nnoremap <silent> <Plug>ChapaPreviousClass          :<C-U>call <SID>PreviousClass(1)        <CR>
+nnoremap <silent> <Plug>ChapaNextClass              :<C-U>call <SID>NextClass(1)            <CR>
 
 " Method Movement:
-nnoremap <silent> <Plug>ChapaPreviousMethod         :<C-U>call <SID>PreviousMethod(1)        <CR>
-nnoremap <silent> <Plug>ChapaNextMethod             :<C-U>call <SID>NextMethod(1)            <CR>
+nnoremap <silent> <Plug>ChapaPreviousMethod         :<C-U>call <SID>PreviousMethod(1)       <CR>
+nnoremap <silent> <Plug>ChapaNextMethod             :<C-U>call <SID>NextMethod(1)           <CR>
 
 " Function Movement:
-nnoremap <silent> <Plug>ChapaPreviousFunction       :<C-U>call <SID>PreviousFunction(1)      <CR>
-nnoremap <silent> <Plug>ChapaNextFunction           :<C-U>call <SID>NextFunction(1)          <CR>
+nnoremap <silent> <Plug>ChapaPreviousFunction       :<C-U>call <SID>PreviousFunction(1)     <CR>
+nnoremap <silent> <Plug>ChapaNextFunction           :<C-U>call <SID>NextFunction(1)         <CR>
+
+" Repeating Movements:
+nnoremap <silent> <Plug>ChapaOppositeRepeat         :<C-U>call <SID>BackwardRepeat()        <CR>
+nnoremap <silent> <Plug>ChapaRepeat                 :<C-U>call <SID>Repeat()                <CR>
 "}}}
