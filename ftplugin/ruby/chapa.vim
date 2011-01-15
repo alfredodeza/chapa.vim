@@ -25,6 +25,10 @@ if (exists('g:chapa_default_mappings'))
     nmap fnm <Plug>ChapaNextMethod
     nmap fpm <Plug>ChapaPreviousMethod
 
+    " Module Movement 
+    nmap fnM <Plug>ChapaNextModule
+    nmap fpM <Plug>ChapaPreviousModule
+
     " Class Visual Select 
     nmap vnc <Plug>ChapaVisualNextClass
     nmap vic <Plug>ChapaVisualThisClass 
@@ -122,7 +126,7 @@ function! s:RubyCommentObject(obj, direction, count)
 
     let beg = line('.')
 
-    let until = s:NextIndent(1)
+    let until = s:NextEnd(1)
 
     " go to the line we need
     exec beg
@@ -183,7 +187,7 @@ function! s:RubySelectObject(obj, direction, count)
 
     let beg = line('.')
 
-    let until = s:NextIndent(1)
+    let until = s:NextEnd(1)
 
     " go to the line we need
     exec beg
@@ -197,42 +201,20 @@ function! s:RubySelectObject(obj, direction, count)
 endfunction
 
 
-function! s:NextIndent(fwd)
+function! s:NextEnd(fwd)
     let line = line('.')
     let column = col('.')
     let lastline = line('$')
     let indent = indent(line)
     let stepvalue = a:fwd ? 1 : -1
 
-    " We look for the last non whitespace 
-    " line (e.g. another function at same indent level
-    " and then go back until we find an indent that 
-    " matches what we are looking for that is NOT whitespace
     let found = 0
+    let matched = 0
     while ((line > 0) && (line <= lastline) && (found == 0))
         let line = line + 1
-
-        if ((indent(line) <= indent) && (getline(line) !~ '^\s*$'))
-            let go_back = line -1 
-            while (getline(go_back) =~ '^\s*$')
-                let go_back = go_back-1 
-                if (getline(go_back) !~ '^\s*$')
-                    break 
-                    let found = 1
-                endif
-            endwhile
-            return go_back 
-
-        " what if we reach end of file and no dice? 
-        elseif (line == lastline)
-            while (getline(line) =~ '^\s*$')
-                let line = line-1 
-                if (getline(line) !~ '^\s*$')
-                    break 
-                endif
-            endwhile
+        if (getline(line) =~ '^\s*end')
             return line
-        endif
+        endif            
     endwhile
 endfunction
  
@@ -254,11 +236,11 @@ function! s:FindRubyObject(obj, direction, count)
     if (a:obj == "class")
         let objregexp  = '\v^\s*(.*class)\s+(\w+)\s*'
     elseif (a:obj == "method")
-        let objregexp = '\v^\s*(.*def)\s+(\w+)\s*'
+        let objregexp = '\v^\s*(.*def)\s+(self*)\s*'
     elseif (a:obj == "module")
         let objregexp = '\v^\s*(.*module)\s+(\w+)\s*'
     else
-        let objregexp = '\v^\s*(.*def)\s+(\w+)\s*'
+        let objregexp = '\v^\s*(.*def)&(.*self)@!'
     endif
     let flag = "W"
     if (a:direction == -1)
@@ -330,11 +312,13 @@ endfunction
 function! s:PreviousObjectLine(obj)
     let beg = line('.')
     if (a:obj == "class")
-        let objregexp  = '\v^\s*(.*class)\s+(\w+)\s*\(\s*'
+        let objregexp  = '\v^\s*(.*class)\s+(\w+)\s*'
+    elseif (a:obj == "module")
+        let objregexp = '\v^\s*(.*module)\s+(\w+)\s*'
     elseif (a:obj == "method")
-        let objregexp = '\v^\s*(.*def)\s+(\w+)\s*\(\s*(self[^)]*)'
+        let objregexp = '\v^\s*(.*def)\s+(self*)\s*'
     else
-        let objregexp = '\v^\s*(.*def)\s+(\w+)\s*\(\s*(.*self)@!'
+        let objregexp = '\v^\s*(.*def)&(.*self)@!'
     endif
 
     let flag = 'Wb' 
