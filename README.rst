@@ -78,10 +78,10 @@ defaults are mapped::
    nmap cif <Plug>ChapaCommentThisFunction
    nmap cnf <Plug>ChapaCommentNextFunction
    nmap cpf <Plug>ChapaCommentPreviousFunction
-
-   " Last Movement
-   nmap <silent> <C-h>  :<C-U>call <SID>BackwardRepeat()<CR>
-   nmap <silent> <C-l>  :<C-U>call <SID>Repeat()<CR>
+    
+   " Repeat Mappings
+   nmap <C-h> <Plug>ChapaOppositeRepeat
+   nmap <C-l> <Plug>ChapaRepeat
 
 If the requested search (function, class or method) is not found, the call simply 
 returns and nothing should happen. However, there is an error message that should 
