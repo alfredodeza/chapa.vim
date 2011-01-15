@@ -278,7 +278,7 @@ function! s:FindPythonObject(obj, direction, count)
     endif
     let _count = a:count
     let matched_search = 0
-    if (count == 0)
+    if (_count == 0)
         let result = search(objregexp, flag)
         if result 
             let matched_search = result 
@@ -320,10 +320,12 @@ function! s:IsInside(object)
     let column = col('.')
     " Verifies you are actually inside 
     " of the object you are referring to 
+    exe beg 
     let class = s:PreviousObjectLine("class")
+    exe beg 
     let method = s:PreviousObjectLine("method")
+    exe beg 
     let function = s:PreviousObjectLine("function")
-
     exe beg 
     exe "normal " column . "|"
 
@@ -355,6 +357,7 @@ function! s:IsInside(object)
 endfunction 
 
 function! s:PreviousObjectLine(obj)
+    let beg = line('.')
     if (a:obj == "class")
         let objregexp  = '\v^\s*(.*class)\s+(\w+)\s*\(\s*'
     elseif (a:obj == "method")
@@ -370,6 +373,9 @@ function! s:PreviousObjectLine(obj)
         return -1
     else
         let result = search(objregexp, flag)
+        if (line('.') == beg)
+            return 0
+        endif
         if result
             return line('.')
         else 
