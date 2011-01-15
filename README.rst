@@ -37,51 +37,51 @@ your vimrc::
 You can map those callables to anything you want, but below is how the 
 defaults are mapped::
 
-   " Function Movement
-   nmap fpf <Plug>ChapaNextFunction
-   nmap Fpf <Plug>ChapaPreviousFunction
+    " Function Movement
+    nmap fnf <Plug>ChapaNextFunction
+    nmap fpf <Plug>ChapaPreviousFunction
 
-   " Class Movement
-   nmap fpc <Plug>ChapaNextClass
-   nmap Fpc <Plug>ChapaPreviousClass
+    " Class Movement
+    nmap fnc <Plug>ChapaNextClass
+    nmap fpc <Plug>ChapaPreviousClass
 
-   " Method Movement
-   nmap fpm <Plug>ChapaNextMethod
-   nmap Fpm <Plug>ChapaPreviousMethod
+    " Method Movement
+    nmap fnm <Plug>ChapaNextMethod
+    nmap fpm <Plug>ChapaPreviousMethod
 
-   " Class Visual Select 
-   nmap vanc <Plug>ChapaVisualNextClass
-   nmap vic <Plug>ChapaVisualThisClass 
-   nmap vapc <Plug>ChapaVisualPreviousClass
+    " Class Visual Select 
+    nmap vnc <Plug>ChapaVisualNextClass
+    nmap vic <Plug>ChapaVisualThisClass 
+    nmap vpc <Plug>ChapaVisualPreviousClass
 
-   " Method Visual Select
-   nmap vanm <Plug>ChapaVisualNextMethod
-   nmap vim <Plug>ChapaVisualThisMethod
-   nmap vapm <Plug>ChapaVisualPreviousMethod
+    " Method Visual Select
+    nmap vnm <Plug>ChapaVisualNextMethod
+    nmap vim <Plug>ChapaVisualThisMethod
+    nmap vpm <Plug>ChapaVisualPreviousMethod
 
-   " Function Visual Select
-   nmap vanf <Plug>ChapaVisualNextFunction
-   nmap vif <Plug>ChapaVisualThisFunction
-   nmap vapf <Plug>ChapaVisualPreviousFunction
+    " Function Visual Select
+    nmap vnf <Plug>ChapaVisualNextFunction
+    nmap vif <Plug>ChapaVisualThisFunction
+    nmap vpf <Plug>ChapaVisualPreviousFunction
 
-   " Comment Class
-   nmap cic <Plug>ChapaCommentThisClass
-   nmap cnc <Plug>ChapaCommentNextClass
-   nmap cpc <Plug>ChapaCommentPreviousClass
+    " Comment Class
+    nmap cic <Plug>ChapaCommentThisClass
+    nmap cnc <Plug>ChapaCommentNextClass
+    nmap cpc <Plug>ChapaCommentPreviousClass
 
-   " Comment Method 
-   nmap cim <Plug>ChapaCommentThisMethod 
-   nmap cnm <Plug>ChapaCommentNextMethod 
-   nmap cpm <Plug>ChapaCommentPreviousMethod 
+    " Comment Method 
+    nmap cim <Plug>ChapaCommentThisMethod 
+    nmap cnm <Plug>ChapaCommentNextMethod 
+    nmap cpm <Plug>ChapaCommentPreviousMethod 
 
-   " Comment Function 
-   nmap cif <Plug>ChapaCommentThisFunction
-   nmap cnf <Plug>ChapaCommentNextFunction
-   nmap cpf <Plug>ChapaCommentPreviousFunction
-    
-   " Repeat Mappings
-   nmap <C-h> <Plug>ChapaOppositeRepeat
-   nmap <C-l> <Plug>ChapaRepeat
+    " Comment Function 
+    nmap cif <Plug>ChapaCommentThisFunction
+    nmap cnf <Plug>ChapaCommentNextFunction
+    nmap cpf <Plug>ChapaCommentPreviousFunction
+
+    " Repeat Mappings
+    nmap <C-h> <Plug>ChapaOppositeRepeat
+    nmap <C-l> <Plug>ChapaRepeat
 
 If the requested search (function, class or method) is not found, the call simply 
 returns and nothing should happen. However, there is an error message that should 
