@@ -252,11 +252,13 @@ function! s:FindRubyObject(obj, direction, count)
     let orig_line = line('.')
     let orig_col = col('.')
     if (a:obj == "class")
-        let objregexp  = '\v^\s*(.*class)\s+(\w+)\s*\(\s*'
+        let objregexp  = '\v^\s*(.*class)\s+(\w+)\s*'
     elseif (a:obj == "method")
-        let objregexp = '\v^\s*(.*def)\s+(\w+)\s*\(\s*(self[^)]*)'
+        let objregexp = '\v^\s*(.*def)\s+(\w+)\s*'
+    elseif (a:obj == "module")
+        let objregexp = '\v^\s*(.*module)\s+(\w+)\s*'
     else
-        let objregexp = '\v^\s*(.*def)\s+(\w+)\s*\(\s*(.*self)@!'
+        let objregexp = '\v^\s*(.*def)\s+(\w+)\s*'
     endif
     let flag = "W"
     if (a:direction == -1)
