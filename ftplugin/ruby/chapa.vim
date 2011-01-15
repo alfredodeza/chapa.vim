@@ -212,8 +212,9 @@ function! s:NextEnd(fwd)
     let matched = 0
     while ((line > 0) && (line <= lastline) && (found == 0))
         let line = line + 1
-        if (getline(line) =~ '^\s*end')
+        if (getline(line) =~ '^\s*end\s*')
             return line
+            let found = 1
         endif            
     endwhile
 endfunction
