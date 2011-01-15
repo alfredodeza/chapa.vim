@@ -97,7 +97,9 @@ function! s:BackwardRepeat()
                 \'s:NextMethod(0)' : 's:PreviousMethod(0)',
                 \'s:PreviousMethod(0)' : 's:NextMethod(0)',
                 \'s:NextFunction(0)' : 's:PreviousFunction(0)',
-                \'s:PreviousFunction(0)' : 's:NextFunction(0)'}
+                \'s:PreviousFunction(0)' : 's:NextFunction(0)',
+                \'s:NextModule(0)' : 's:PreviousModule(0)',
+                \'s:PreviousModule(0)' : 's:NextModule(0)'}
     if (exists('g:chapa_last_action'))
         let fwd = g:chapa_last_action 
         let cmd = "call " . act_map[fwd]
@@ -239,7 +241,7 @@ function! s:FindRubyObject(obj, direction, count)
     elseif (a:obj == "method")
         let objregexp = '\v^\s*(.*def)\s+(self*)\s*'
     elseif (a:obj == "module")
-        let objregexp = '\v^\s*(.*module)\s+(\w+)\s*'
+        let objregexp = '\v^\s*module\s+(\w+)\s*'
     else
         let objregexp = '\v^\s*(.*def)&(.*self)@!'
     endif
@@ -281,6 +283,8 @@ function! s:IsInside(object)
     exe beg 
     let function = s:PreviousObjectLine("function")
     exe beg 
+    let module = s:PreviousObjectLine("module")
+    exe beg
     exe "normal " column . "|"
 
     if (a:object == "function")
@@ -307,6 +311,14 @@ function! s:IsInside(object)
         else 
             return 0
         endif 
+    elseif (a:object == "module")
+        if (module == -1)
+            return -1
+        elseif ((function < module) && (class < module))
+            return 1
+        else 
+            return 0
+        endif
     endif 
 endfunction 
 
@@ -546,6 +558,27 @@ function! s:NextFunction(record)
         call s:Echo("Could not match next function")
     endif 
 endfunction
+
+" Module:
+function! s:PreviousModule(record)
+    if (a:record == 1)
+        let g:chapa_last_action = "s:PreviousModule(0)"
+    endif
+    let inside = s:IsInside("module")
+    let times = v:count1+inside
+    if (! s:FindRubyObject("module", -1, times))
+        call s:Echo("Could not match previous module")
+    endif 
+endfunction
+        
+function! s:NextModule(record)
+    if (a:record == 1)
+        let g:chapa_last_action = "s:NextModule(0)"
+    endif
+    if (! s:FindRubyObject("module", 1, v:count1))
+        call s:Echo("Could not match next module")
+    endif 
+endfunction
 "}}}
 
 "{{{ Misc 
@@ -590,6 +623,10 @@ nnoremap <silent> <Plug>ChapaNextMethod             :<C-U>call <SID>NextMethod(1
 " Function Movement:
 nnoremap <silent> <Plug>ChapaPreviousFunction       :<C-U>call <SID>PreviousFunction(1)     <CR>
 nnoremap <silent> <Plug>ChapaNextFunction           :<C-U>call <SID>NextFunction(1)         <CR>
+
+" Module Movement:
+nnoremap <silent> <Plug>ChapaPreviousModule         :<C-U>call <SID>PreviousModule(1)       <CR>
+nnoremap <silent> <Plug>ChapaNextModule             :<C-U>call <SID>NextModule(1)           <CR>
 
 " Repeating Movements:
 nnoremap <silent> <Plug>ChapaOppositeRepeat         :<C-U>call <SID>BackwardRepeat()        <CR>
