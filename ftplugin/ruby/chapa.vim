@@ -44,6 +44,11 @@ if (exists('g:chapa_default_mappings'))
     nmap vif <Plug>ChapaVisualThisFunction
     nmap vpf <Plug>ChapaVisualPreviousFunction
 
+    " Module Visual Select
+    nmap vnM <Plug>ChapaVisualNextModule
+    nmap viM <Plug>ChapaVisualThisModule
+    nmap vpM <Plug>ChapaVisualPreviousModule
+
     " Comment Class
     nmap cic <Plug>ChapaCommentThisClass
     nmap cnc <Plug>ChapaCommentNextClass
@@ -58,6 +63,11 @@ if (exists('g:chapa_default_mappings'))
     nmap cif <Plug>ChapaCommentThisFunction
     nmap cnf <Plug>ChapaCommentNextFunction
     nmap cpf <Plug>ChapaCommentPreviousFunction
+
+    " Comment Module
+    nmap ciM <Plug>ChapaCommentThisModule
+    nmap cnM <Plug>ChapaCommentNextModule
+    nmap cpM <Plug>ChapaCommentPreviousModule
 
     " Repeat Mappings
     nmap <C-h> <Plug>ChapaOppositeRepeat
@@ -427,6 +437,30 @@ function! s:CommentThisFunction()
 endfunction
 
 "
+" Comment Module Selections:
+"
+function! s:CommentPreviousModule()
+    let inside = s:IsInside("module")
+    let times = v:count1+inside
+    if (! s:RubyCommentObject("module", -1, times))
+        call s:Echo("Could not match previous module for commenting")
+    endif 
+endfunction
+
+function! s:CommentNextModule()
+    if (! s:RubyCommentObject("module", 1, v:count1))
+        call s:Echo("Could not match next module for commenting")
+    endif 
+endfunction
+
+function! s:CommentThisModule()
+    if (! s:RubyCommentObject("module", -1, 1))
+        call s:Echo("Could not match inside of module for commenting")
+    endif 
+endfunction
+
+
+"
 " Visual Selections:
 "
 " Visual Class Selections:
@@ -492,6 +526,28 @@ function! s:VisualThisMethod()
         call s:Echo("Could not match inside of method for visual selection")
     endif 
 endfunction
+
+" Visual Module Selections:
+function! s:VisualNextModule()
+    if (! s:RubySelectObject("module", 1, v:count1))
+        call s:Echo("Could not match next module for visual selection")
+    endif
+endfunction
+
+function! s:VisualPreviousModule()
+    let inside = s:IsInside("module")
+    let times = v:count1+inside
+    if (! s:RubySelectObject("module", -1, times))
+        call s:Echo("Could not match previous module for visual selection")
+    endif 
+endfunction
+
+function! s:VisualThisModule()
+    if (! s:RubySelectObject("module", -1, 1))
+        call s:Echo("Could not match inside of module for visual selection")
+    endif 
+endfunction
+
 
 " 
 " Movements:
@@ -597,6 +653,11 @@ nnoremap <silent> <Plug>ChapaCommentPreviousFunction   :<C-U>call <SID>CommentPr
 nnoremap <silent> <Plug>ChapaCommentNextFunction       :<C-U>call <SID>CommentNextFunction()      <CR>
 nnoremap <silent> <Plug>ChapaCommentThisFunction       :<C-U>call <SID>CommentThisFunction()      <CR>
 
+" Comment Module: 
+nnoremap <silent> <Plug>ChapaCommentPreviousModule   :<C-U>call <SID>CommentPreviousModule()  <CR>
+nnoremap <silent> <Plug>ChapaCommentNextModule       :<C-U>call <SID>CommentNextModule()      <CR>
+nnoremap <silent> <Plug>ChapaCommentThisModule       :<C-U>call <SID>CommentThisModule()      <CR>
+
 " Visual Select Class:
 nnoremap <silent> <Plug>ChapaVisualNextClass        :<C-U>call <SID>VisualNextClass()       <CR>
 nnoremap <silent> <Plug>ChapaVisualPreviousClass    :<C-U>call <SID>VisualPreviousClass()   <CR>
@@ -611,6 +672,11 @@ nnoremap <silent> <PLug>ChapaVisualThisMethod       :<C-U>call <SID>VisualThisMe
 nnoremap <silent> <Plug>ChapaVisualNextFunction     :<C-U>call <SID>VisualNextFunction()    <CR>
 nnoremap <silent> <Plug>ChapaVisualPreviousFunction :<C-U>call <SID>VisualPreviousFunction()<CR>
 nnoremap <silent> <Plug>ChapaVisualThisFunction     :<C-U>call <SID>VisualThisFunction()    <CR>
+
+" Visual Select Module:
+nnoremap <silent> <Plug>ChapaVisualNextModule       :<C-U>call <SID>VisualNextModule()      <CR>
+nnoremap <silent> <Plug>ChapaVisualPreviousModule   :<C-U>call <SID>VisualPreviousModule()  <CR>
+nnoremap <silent> <Plug>ChapaVisualThisModule       :<C-U>call <SID>VisualThisModule()      <CR>
 
 " Class Movement:
 nnoremap <silent> <Plug>ChapaPreviousClass          :<C-U>call <SID>PreviousClass(1)        <CR>
