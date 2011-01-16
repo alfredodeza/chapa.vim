@@ -248,18 +248,17 @@ function! s:NextEnd(fwd, obj)
     let matched = 0
     while ((line > 0) && (line <= lastline) && (found == 0))
         let line = line + 1
-        if (getline(line) =~ '\v^\s*(.*class)\s+(\w+)\s*')
+        if (getline(line) =~ '\v^\s*(.*class)\s+(\w+)\s*&(.*end)@!')
             let c_class = c_class + 1
-        elseif (getline(line) =~ '\v^\s*(.*def)\s+(self*)\s*')
+        elseif (getline(line) =~ '\v^\s*(.*def)\s+(self*)\s*&(.*end)@!')
             let c_method = c_method + 1
-        elseif (getline(line) =~ '\v^\s*module\s+(\w+)\s*')
+        elseif (getline(line) =~ '\v^\s*(.*module)\s+(\w+)\s*&(.*end)@!')
             let c_module = c_module + 1
-        
-        elseif (getline(line) =~ '\v^\s*(.*def)&(.*self)@!')
+        elseif (getline(line) =~ '\v^\s*(.*def)&(.*self)@!&(.*end)@!')
             let c_function = c_function + 1
         endif            
 
-        if (getline(line) =~ '^\s*end\s*')
+        if (getline(line) =~ '\v^\s*(.*end)\s*')
             let c_end = c_end + 1
             if (c_class + c_method + c_function + c_module == c_end)
                 return line 
@@ -285,13 +284,13 @@ function! s:FindRubyObject(obj, direction, count)
     let orig_line = line('.')
     let orig_col = col('.')
     if (a:obj == "class")
-        let objregexp  = '\v^\s*(.*class)\s+(\w+)\s*'
+        let objregexp  = '\v^\s*(.*class)\s+(\w+)\s*&(.*end)@!'
     elseif (a:obj == "method")
-        let objregexp = '\v^\s*(.*def)\s+(self*)\s*'
+        let objregexp = '\v^\s*(.*def)\s+(self*)\s*&(.*end)@!'
     elseif (a:obj == "module")
-        let objregexp = '\v^\s*module\s+(\w+)\s*'
+        let objregexp = '\v^\s*(.*module)\s+(\w+)\s*&(.*end)@!'
     else
-        let objregexp = '\v^\s*(.*def)&(.*self)@!'
+        let objregexp = '\v^\s*(.*def)&(.*self)@!&(.*end)@!'
     endif
     let flag = "W"
     if (a:direction == -1)
