@@ -6,8 +6,12 @@ or visually select the next/previous N class, function or method
 
 or comment (or toggle) out the next/previous N class, function or method.
 
-Installation couldn't be easier: drop the plugin file in your vim plugin 
-directory.
+As this is a "file-type plugin", it currently supports both Python and Ruby.
+
+Installation couldn't be easier: drop the ftplugin file in your vim ftplugin 
+directory. For example, if you are using Python, this would be something like::
+
+    ~/.vim/ftplugin/python/chapa.vim
 
 I would highly recommend you use something like Pathogen though, it 
 makes dealing with VIM plugins way easier.
@@ -18,7 +22,7 @@ makes dealing with VIM plugins way easier.
 After trying other plugins that were supposed to achieve this objective (and 
 fail) I decided to write it on my own.  
 
-No need to have VIM compiled with Python support since this plugin uses 
+No need to have VIM compiled with Python or Ruby support since this plugin uses 
 pure VIM syntax.
 
 2. Usage                                
@@ -83,6 +87,25 @@ defaults are mapped::
     nmap <C-h> <Plug>ChapaOppositeRepeat
     nmap <C-l> <Plug>ChapaRepeat
 
+
+    """""""""""""""""""""""""""""""""""""""""""""
+    " Ruby-Only Section
+    """""""""""""""""""""""""""""""""""""""""""""
+
+    " Comment Module 
+    nmap ciM <Plug>ChapaCommentThisModule
+    nmap cnM <Plug>ChapaCommentNextModule
+    nmap cpM <Plug>ChapaCommentPreviousModule
+
+    " Module Visual Select
+    nmap vnM <Plug>ChapaVisualNextModule
+    nmap viM <Plug>ChapaVisualThisModule
+    nmap vpM <Plug>ChapaVisualPreviousModule
+
+    " Module Movement
+    nmap fnM <Plug>ChapaNextModule
+    nmap fpM <Plug>ChapaPreviousModule
+
 If the requested search (function, class or method) is not found, the call simply 
 returns and nothing should happen. However, there is an error message that should 
 display by default, explaining what it was supposed to search and in what 
@@ -95,12 +118,12 @@ You can disable this by adding a chapa-specific variable in your vimrc::
 You can also add a "count" to repeat the match N times. So if you want to go 
 to the 3rd previous class you would (with the mappings above) do something like::
 
-  3Fpc
+  3fpc
 
 The same applies for visual selections. If you want to visually select the 3rd
 next method, you would do it like::
 
-  3vanm
+  3vnm
 
 You can also toggle comments of a given class, method or function. To comment
 the next class::
