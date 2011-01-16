@@ -254,9 +254,20 @@ function! s:NextEnd(fwd, obj)
             let c_method = c_method + 1
         elseif (getline(line) =~ '\v^\s*(.*module)\s+(\w+)\s*&(.*end)@!')
             let c_module = c_module + 1
-        elseif (getline(line) =~ '\v^\s*(.*def)&(.*self)@!&(.*end)@!')
+        elseif (getline(line) =~ '\v^\s*(.*def)\s+&(.*self)@!&(.*end)@!')
             let c_function = c_function + 1
+
+        " Match keywords that trigger `end` in Ruby 
+        " if else while until do for 
+    "elseif (getline(line) =~ '\v^\s+(if|else|while|until|do|for)\s+')
+    elseif (getline(line) =~ '\v^\s+if\s+')
+            let c_end = c_end -1
+    elseif (getline(line) =~ '\v^\s+unless\s+')
+            let c_end = c_end -1
+    elseif (getline(line) =~ '\v\s+do\s+')
+            let c_end = c_end -1
         endif            
+
 
         if (getline(line) =~ '\v^\s*(.*end)\s*')
             let c_end = c_end + 1
@@ -290,7 +301,7 @@ function! s:FindRubyObject(obj, direction, count)
     elseif (a:obj == "module")
         let objregexp = '\v^\s*(.*module)\s+(\w+)\s*&(.*end)@!'
     else
-        let objregexp = '\v^\s*(.*def)&(.*self)@!&(.*end)@!'
+        let objregexp = '\v^\s*(.*def)\s+&(.*self)@!&(.*end)@!'
     endif
     let flag = "W"
     if (a:direction == -1)
