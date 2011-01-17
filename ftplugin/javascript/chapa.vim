@@ -18,38 +18,10 @@ if (exists('g:chapa_default_mappings'))
     nmap fnf <Plug>ChapaNextFunction
     nmap fpf <Plug>ChapaPreviousFunction
 
-    " Class Movement
-    nmap fnc <Plug>ChapaNextClass
-    nmap fpc <Plug>ChapaPreviousClass
-
-    " Method Movement
-    nmap fnm <Plug>ChapaNextMethod
-    nmap fpm <Plug>ChapaPreviousMethod
-
-    " Class Visual Select 
-    nmap vnc <Plug>ChapaVisualNextClass
-    nmap vic <Plug>ChapaVisualThisClass 
-    nmap vpc <Plug>ChapaVisualPreviousClass
-
-    " Method Visual Select
-    nmap vnm <Plug>ChapaVisualNextMethod
-    nmap vim <Plug>ChapaVisualThisMethod
-    nmap vpm <Plug>ChapaVisualPreviousMethod
-
     " Function Visual Select
     nmap vnf <Plug>ChapaVisualNextFunction
     nmap vif <Plug>ChapaVisualThisFunction
     nmap vpf <Plug>ChapaVisualPreviousFunction
-
-    " Comment Class
-    nmap cic <Plug>ChapaCommentThisClass
-    nmap cnc <Plug>ChapaCommentNextClass
-    nmap cpc <Plug>ChapaCommentPreviousClass
-
-    " Comment Method 
-    nmap cim <Plug>ChapaCommentThisMethod 
-    nmap cnm <Plug>ChapaCommentNextMethod 
-    nmap cpm <Plug>ChapaCommentPreviousMethod 
 
     " Comment Function 
     nmap cif <Plug>ChapaCommentThisFunction
@@ -89,11 +61,7 @@ function! s:Repeat()
 endfunction
 
 function! s:BackwardRepeat()
-    let act_map = {'s:NextClass(0)' : 's:PreviousClass(0)',
-                \'s:PreviousClass(0)' : 's:NextClass(0)',
-                \'s:NextMethod(0)' : 's:PreviousMethod(0)',
-                \'s:PreviousMethod(0)' : 's:NextMethod(0)',
-                \'s:NextFunction(0)' : 's:PreviousFunction(0)',
+    let act_map = {'s:NextFunction(0)' : 's:PreviousFunction(0)',
                 \'s:PreviousFunction(0)' : 's:NextFunction(0)'}
     if (exists('g:chapa_last_action'))
         let fwd = g:chapa_last_action 
@@ -107,13 +75,13 @@ endfunction
 
 "{{{ Main Functions 
 " Range for commenting 
-function! s:PythonCommentObject(obj, direction, count)
+function! s:JSCommentObject(obj, direction, count)
     let orig_line = line('.')
     let orig_col = col('.')
 
     " Go to the object declaration
     normal $
-    let go_to_obj = s:FindPythonObject(a:obj, a:direction, a:count)
+    let go_to_obj = s:FindObject(a:obj, a:direction, a:count)
         
     if (! go_to_obj)
         exec orig_line
@@ -174,7 +142,7 @@ function! s:PythonSelectObject(obj, direction, count)
 
     " Go to the object declaration
     normal $
-    let go_to_obj = s:FindPythonObject(a:obj, a:direction, a:count)
+    let go_to_obj = s:FindObject(a:obj, a:direction, a:count)
         
     if (! go_to_obj)
         exec orig_line
@@ -182,14 +150,7 @@ function! s:PythonSelectObject(obj, direction, count)
         return
     endif
 
-    " Sometimes, when we get a decorator we are not in the line we want 
-    let has_decorator = s:HasPythonDecorator(line('.'))
-
-    if has_decorator 
-        let beg = has_decorator 
-    else 
-        let beg = line('.')
-    endif
+    let beg = line('.')
 
     let until = s:NextIndent(1)
 
@@ -212,57 +173,25 @@ function! s:NextIndent(fwd)
     let indent = indent(line)
     let stepvalue = a:fwd ? 1 : -1
 
-    let o_regex = '\v^\s*\{\s*'
-    let c_regex = '\v^\s*\}\s*'
+    exe 'normal f{'
+    exe 'normal %'
 
-    let c_open = 1
-    if (getline(line) =~ c_regex)
-        let c_close = 1 
-    else
-        let c_close = 0
-    endif
+    let closing_brace = line('.')
+    " return to initial line 
+    exe line 
 
-    let found = 0
-    let matched = 0
-    while ((line > 0) && (line <= lastline) && (found == 0))
-        let line = line + 1
-        if (getline(line) =~ o_regex)
-            let c_open = c_open + 1
-        endif 
+    return closing_brace 
 
-        if (getline(line) =~ c_regex)
-            let c_close = c_close + 1
-            if (c_open == c_close) 
-                return line 
-                let found = 1 
-            endif
-        endif
-    endwhile
 
 endfunction
  
 
-" Go to previous (-1) or next (1) class/function definition
-" return a line number that matches either a class or a function
-" to call this manually:
-" Backwards:
-"     :call FindPythonObject("class", -1)
-" Forwards:
-"     :call FindPythonObject("class")
-" Functions Backwards:
-"     :call FindPythonObject("function", -1)
-" Functions Forwards:
-"     :call FindPythonObject("function")
-function! s:FindPythonObject(obj, direction, count)
+" Go to previous (-1) or next (1) function definition
+" return a line number that matches a function
+function! s:FindObject(obj, direction, count)
     let orig_line = line('.')
     let orig_col = col('.')
-    if (a:obj == "class")
-        let objregexp  = '\v^\s*(.*class)\s+(\w+)\s*\(\s*'
-    elseif (a:obj == "method")
-        let objregexp = '\v^\s*(.*def)\s+(\w+)\s*\(\s*(self[^)]*)'
-    else
-        let objregexp = '\v^\s*(.*function\()\s*\)\s*\{'
-    endif
+    let objregexp = '\v^\s*(.*function)\s*\('
     let flag = "W"
     if (a:direction == -1)
         let flag = flag."b"
@@ -289,73 +218,32 @@ function! s:FindPythonObject(obj, direction, count)
 endfunction
 
 
-"function! s:HasPythonDecorator(line)
-"    " Get to the previous line where the decorator lives
-"    let line = a:line -1 
-"    while (getline(line) =~ '\v^(.*\@[a-zA-Z])')
-"        let line = line - 1
-"    endwhile
-"
-"    " This is tricky but goes back and forth to 
-"    " correctly match the decorator without the 
-"    " possibility of selecting a blank line
-"    if (getline(line) =~ '\v^(.*\@[a-zA-Z])')
-"        return line
-"    elseif (getline(line+1) =~ '\v^(.*\@[a-zA-Z])')
-"        return line + 1
-"    endif
-"endfunction
-
 function! s:IsInside(object)
     let beg = line('.')
     let column = col('.')
     " Verifies you are actually inside 
     " of the object you are referring to 
-    exe beg 
-    let class = s:PreviousObjectLine("class")
-    exe beg 
-    let method = s:PreviousObjectLine("method")
-    exe beg 
     let function = s:PreviousObjectLine("function")
+    exe 'normal f{'
+    exe 'normal %'
+    let c_brace = line('.')
+
+    "get back to the beginning 
     exe beg 
     exe "normal " column . "|"
 
-    if (a:object == "function")
-        if (function == -1)
-            return -1
-        elseif ((class < function) && (method < function))
-            return 1
-        else 
-            return 0 
-        endif 
-    elseif (a:object == "class")
-        if (class == -1)
-            return -1
-        elseif ((function < class) && (method < class))
-            return 1
-        else 
-            return 0 
-        endif 
-    elseif (a:object == "method")
-        if (method == -1)
-            return -1
-        elseif ((function < method) && (class < method))
-            return 1
-        else 
-            return 0
-        endif 
-    endif 
+    if (function == -1)
+        return -1
+    elseif (beg < c_brace) && (beg > function)
+        return 1
+    else 
+        return 0
+    endif
 endfunction 
 
 function! s:PreviousObjectLine(obj)
     let beg = line('.')
-    if (a:obj == "class")
-        let objregexp  = '\v^\s*(.*class)\s+(\w+)\s*\(\s*'
-    elseif (a:obj == "method")
-        let objregexp = '\v^\s*(.*def)\s+(\w+)\s*\(\s*(self[^)]*)'
-    else
-        let objregexp = '\v^\s*(.*function\()\s*\)\s*\{'
-    endif
+    let objregexp = '\v^\s*(.*function)\s*\('
 
     let flag = 'Wb' 
 
@@ -379,72 +267,25 @@ endfunction
 
 "{{{ Proxy Functions 
 "
-" Commenting Selections
-"
-" Comment Class Selections:
-"
-function! s:CommentPreviousClass()
-    let inside = s:IsInside("class")
-    let times = v:count1+inside
-    if (! s:PythonCommentObject("class", -1, times))
-        call s:Echo("Could not match previous class for commenting")
-    endif 
-endfunction
-
-function! s:CommentNextClass()
-    if (! s:PythonCommentObject("class", 1, v:count1))
-        call s:Echo("Could not match next class for commenting")
-    endif 
-endfunction
-
-function! s:CommentThisClass()
-    if (! s:PythonCommentObject("class", -1, 1))
-        call s:Echo("Could not match inside of class for commenting")
-    endif 
-endfunction
-
-"
-" Comment Method Selections:
-"
-function! s:CommentPreviousMethod()
-    let inside = s:IsInside("method")
-    let times = v:count1+inside
-    if (! s:PythonCommentObject("method", -1, times))
-        call s:Echo("Could not match previous method for commenting")
-    endif 
-endfunction
-
-function! s:CommentNextMethod()
-    if (! s:PythonCommentObject("method", 1, v:count1))
-        call s:Echo("Could not match next method for commenting")
-    endif 
-endfunction
-
-function! s:CommentThisMethod()
-    if (! s:PythonCommentObject("method", -1, 1))
-        call s:Echo("Could not match inside of method for commenting")
-    endif 
-endfunction
-
 "
 " Comment Function Selections:
 "
 function! s:CommentPreviousFunction()
     let inside = s:IsInside("function")
     let times = v:count1+inside
-    if (! s:PythonCommentObject("function", -1, times))
+    if (! s:JSCommentObject("function", -1, times))
         call s:Echo("Could not match previous function for commenting")
     endif 
 endfunction
 
 function! s:CommentNextFunction()
-    if (! s:PythonCommentObject("function", 1, v:count1))
+    if (! s:JSCommentObject("function", 1, v:count1))
         call s:Echo("Could not match next function for commenting")
     endif 
 endfunction
 
 function! s:CommentThisFunction()
-    if (! s:PythonCommentObject("function", -1, 1))
+    if (! s:JSCommentObject("function", -1, 1))
         call s:Echo("Could not match inside of function for commenting")
     endif 
 endfunction
@@ -452,28 +293,6 @@ endfunction
 "
 " Visual Selections:
 "
-" Visual Class Selections:
-function! s:VisualNextClass()
-    if (! s:PythonSelectObject("class", 1, v:count1))
-        call s:Echo("Could not match next class for visual selection")
-    endif
-endfunction
-
-function! s:VisualPreviousClass()
-    let inside = s:IsInside("class")
-    let times = v:count1+inside
-    if (! s:PythonSelectObject("class", -1, times))
-        call s:Echo("Could not match previous class for visual selection")
-    endif 
-endfunction
-
-function! s:VisualThisClass()
-    if (! s:PythonSelectObject("class", -1, 1))
-        call s:Echo("Could not match inside of class for visual selection")
-    endif 
-endfunction
-
-
 " Visual Function Selections:
 function! s:VisualNextFunction()
     if (! s:PythonSelectObject("function", 1, v:count1))
@@ -495,72 +314,11 @@ function! s:VisualThisFunction()
     endif 
 endfunction
 
-" Visual Method Selections:
-function! s:VisualNextMethod()
-    if (! s:PythonSelectObject("method", 1, v:count1))
-        call s:Echo("Could not match next method for visual selection")
-    endif
-endfunction
-
-function! s:VisualPreviousMethod()
-    let inside = s:IsInside("method")
-    let times = v:count1+inside
-    if (! s:PythonSelectObject("method", -1, times))
-        call s:Echo("Could not match previous method for visual selection")
-    endif 
-endfunction
-
-function! s:VisualThisMethod()
-    if (! s:PythonSelectObject("method", -1, 1))
-        call s:Echo("Could not match inside of method for visual selection")
-    endif 
-endfunction
 
 " 
 " Movements:
 " 
 " Class:
-function! s:PreviousClass(record)
-    if (a:record == 1)
-        let g:chapa_last_action = "s:PreviousClass(0)"
-    endif
-    let inside = s:IsInside("class")
-    let times = v:count1+inside
-    if (! s:FindPythonObject("class", -1, times))
-        call s:Echo("Could not match previous class")
-    endif 
-endfunction 
-
-function! s:NextClass(record)
-    if (a:record == 1)
-        let g:chapa_last_action = "s:NextClass(0)"
-    endif
-    if (! s:FindPythonObject("class", 1, v:count1))
-        call s:Echo("Could not match next class")
-    endif 
-endfunction 
-
-" Method:
-function! s:PreviousMethod(record)
-    if (a:record == 1)
-        let g:chapa_last_action = "s:PreviousMethod(0)"
-    endif
-    let inside = s:IsInside("method")
-    let times = v:count1+inside
-    if (! s:FindPythonObject("method", -1, times))
-        call s:Echo("Could not match previous method")
-    endif 
-endfunction 
-
-function! s:NextMethod(record)
-    if (a:record == 1)
-        let g:chapa_last_action = "s:NextMethod(0)"
-    endif
-    if (! s:FindPythonObject("method", 1, v:count1))
-        call s:Echo("Could not match next method")
-    endif 
-endfunction 
-
 " Function:
 function! s:PreviousFunction(record)
     if (a:record == 1)
@@ -568,7 +326,7 @@ function! s:PreviousFunction(record)
     endif
     let inside = s:IsInside("function")
     let times = v:count1+inside
-    if (! s:FindPythonObject("function", -1, times))
+    if (! s:FindObject("function", -1, times))
         call s:Echo("Could not match previous function")
     endif 
 endfunction
@@ -577,50 +335,22 @@ function! s:NextFunction(record)
     if (a:record == 1)
         let g:chapa_last_action = "s:NextFunction(0)"
     endif
-    if (! s:FindPythonObject("function", 1, v:count1))
+    if (! s:FindObject("function", 1, v:count1))
         call s:Echo("Could not match next function")
     endif 
 endfunction
 "}}}
 
 "{{{ Misc 
-" Comment Class: 
-nnoremap <silent> <Plug>ChapaCommentPreviousClass   :<C-U>call <SID>CommentPreviousClass() <CR>
-nnoremap <silent> <Plug>ChapaCommentNextClass       :<C-U>call <SID>CommentNextClass()     <CR>
-nnoremap <silent> <Plug>ChapaCommentThisClass       :<C-U>call <SID>CommentThisClass()     <CR>
-
-" Comment Method: 
-nnoremap <silent> <Plug>ChapaCommentPreviousMethod   :<C-U>call <SID>CommentPreviousMethod()<CR>
-nnoremap <silent> <Plug>ChapaCommentNextMethod       :<C-U>call <SID>CommentNextMethod()    <CR>
-nnoremap <silent> <Plug>ChapaCommentThisMethod       :<C-U>call <SID>CommentThisMethod()    <CR>
-
 " Comment Function: 
 nnoremap <silent> <Plug>ChapaCommentPreviousFunction   :<C-U>call <SID>CommentPreviousFunction()  <CR>
 nnoremap <silent> <Plug>ChapaCommentNextFunction       :<C-U>call <SID>CommentNextFunction()      <CR>
 nnoremap <silent> <Plug>ChapaCommentThisFunction       :<C-U>call <SID>CommentThisFunction()      <CR>
 
-" Visual Select Class:
-nnoremap <silent> <Plug>ChapaVisualNextClass        :<C-U>call <SID>VisualNextClass()       <CR>
-nnoremap <silent> <Plug>ChapaVisualPreviousClass    :<C-U>call <SID>VisualPreviousClass()   <CR>
-nnoremap <silent> <Plug>ChapaVisualThisClass        :<C-U>call <SID>VisualThisClass()       <CR>
-
-" Visual Select Method:
-nnoremap <silent> <Plug>ChapaVisualNextMethod       :<C-U>call <SID>VisualNextMethod()      <CR>
-nnoremap <silent> <Plug>ChapaVisualPreviousMethod   :<C-U>call <SID>VisualPreviousMethod()  <CR>
-nnoremap <silent> <PLug>ChapaVisualThisMethod       :<C-U>call <SID>VisualThisMethod()      <CR>
-
 " Visual Select Function:
 nnoremap <silent> <Plug>ChapaVisualNextFunction     :<C-U>call <SID>VisualNextFunction()    <CR>
 nnoremap <silent> <Plug>ChapaVisualPreviousFunction :<C-U>call <SID>VisualPreviousFunction()<CR>
 nnoremap <silent> <Plug>ChapaVisualThisFunction     :<C-U>call <SID>VisualThisFunction()    <CR>
-
-" Class Movement:
-nnoremap <silent> <Plug>ChapaPreviousClass          :<C-U>call <SID>PreviousClass(1)        <CR>
-nnoremap <silent> <Plug>ChapaNextClass              :<C-U>call <SID>NextClass(1)            <CR>
-
-" Method Movement:
-nnoremap <silent> <Plug>ChapaPreviousMethod         :<C-U>call <SID>PreviousMethod(1)       <CR>
-nnoremap <silent> <Plug>ChapaNextMethod             :<C-U>call <SID>NextMethod(1)           <CR>
 
 " Function Movement:
 nnoremap <silent> <Plug>ChapaPreviousFunction       :<C-U>call <SID>PreviousFunction(1)     <CR>
