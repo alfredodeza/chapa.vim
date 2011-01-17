@@ -156,12 +156,18 @@ function! s:PythonSelectObject(obj, direction, count)
 
     " go to the line we need
     exec beg
-    let line_moves = until - beg
 
-    if line_moves > 0
-        execute "normal V" . line_moves . "j"
+    " catch a one line definition 
+    if (until == beg)
+        execute "normal v$"
     else
-        execute "normal VG" 
+        let line_moves = until - beg
+
+        if line_moves > 0
+            execute "normal V" . line_moves . "j"
+        else
+            execute "normal VG" 
+        endif
     endif
 endfunction
 
