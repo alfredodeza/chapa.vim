@@ -95,6 +95,9 @@ function! s:JSCommentObject(obj, direction, count)
 
     " go to the line we need
     exec beg
+
+    " catch same line definitions 
+    
     let line_moves = until - beg
 
     " check if we have comments or not 
@@ -104,6 +107,11 @@ function! s:JSCommentObject(obj, direction, count)
         let until = s:LastComment(beg)
     else
         let regex = ' s/^/\/\//'
+    endif
+
+    if (until == beg)
+        execute regex    
+        return 1
     endif
         
     if line_moves > 0
@@ -324,7 +332,6 @@ endfunction
 " 
 " Movements:
 " 
-" Class:
 " Function:
 function! s:PreviousFunction(record)
     if (a:record == 1)
