@@ -1,9 +1,10 @@
 " File:        chapa.vim
-" FileType:    ruby
 " Description: Go to or visually select the next/previous class, method or
-"              function in ruby.
+"              function in Python.
 " Maintainer:  Alfredo Deza <alfredodeza AT gmail.com>
 " License:     MIT
+" Notes:       A lot of the code within was adapted/copied from python.vim 
+"              and python_fn.vim authored by Jon Franklin and Mikael Berthe
 "
 "============================================================================
 
@@ -25,10 +26,6 @@ if (exists('g:chapa_default_mappings'))
     nmap fnm <Plug>ChapaNextMethod
     nmap fpm <Plug>ChapaPreviousMethod
 
-    " Module Movement 
-    nmap fnM <Plug>ChapaNextModule
-    nmap fpM <Plug>ChapaPreviousModule
-
     " Class Visual Select 
     nmap vnc <Plug>ChapaVisualNextClass
     nmap vic <Plug>ChapaVisualThisClass 
@@ -44,11 +41,6 @@ if (exists('g:chapa_default_mappings'))
     nmap vif <Plug>ChapaVisualThisFunction
     nmap vpf <Plug>ChapaVisualPreviousFunction
 
-    " Module Visual Select
-    nmap vnM <Plug>ChapaVisualNextModule
-    nmap viM <Plug>ChapaVisualThisModule
-    nmap vpM <Plug>ChapaVisualPreviousModule
-
     " Comment Class
     nmap cic <Plug>ChapaCommentThisClass
     nmap cnc <Plug>ChapaCommentNextClass
@@ -63,11 +55,6 @@ if (exists('g:chapa_default_mappings'))
     nmap cif <Plug>ChapaCommentThisFunction
     nmap cnf <Plug>ChapaCommentNextFunction
     nmap cpf <Plug>ChapaCommentPreviousFunction
-
-    " Comment Module
-    nmap ciM <Plug>ChapaCommentThisModule
-    nmap cnM <Plug>ChapaCommentNextModule
-    nmap cpM <Plug>ChapaCommentPreviousModule
 
     " Repeat Mappings
     nmap <C-h> <Plug>ChapaOppositeRepeat
@@ -107,9 +94,7 @@ function! s:BackwardRepeat()
                 \'s:NextMethod(0)' : 's:PreviousMethod(0)',
                 \'s:PreviousMethod(0)' : 's:NextMethod(0)',
                 \'s:NextFunction(0)' : 's:PreviousFunction(0)',
-                \'s:PreviousFunction(0)' : 's:NextFunction(0)',
-                \'s:NextModule(0)' : 's:PreviousModule(0)',
-                \'s:PreviousModule(0)' : 's:NextModule(0)'}
+                \'s:PreviousFunction(0)' : 's:NextFunction(0)'}
     if (exists('g:chapa_last_action'))
         let fwd = g:chapa_last_action 
         let cmd = "call " . act_map[fwd]
@@ -122,13 +107,13 @@ endfunction
 
 "{{{ Main Functions 
 " Range for commenting 
-function! s:RubyCommentObject(obj, direction, count)
+function! s:PythonCommentObject(obj, direction, count)
     let orig_line = line('.')
     let orig_col = col('.')
 
     " Go to the object declaration
     normal $
-    let go_to_obj = s:FindRubyObject(a:obj, a:direction, a:count)
+    let go_to_obj = s:FindPythonObject(a:obj, a:direction, a:count)
         
     if (! go_to_obj)
         exec orig_line
@@ -138,7 +123,7 @@ function! s:RubyCommentObject(obj, direction, count)
 
     let beg = line('.')
 
-    let until = s:NextEnd(1, a:obj)
+    let until = s:NextIndent(1)
 
     " go to the line we need
     exec beg
@@ -147,10 +132,10 @@ function! s:RubyCommentObject(obj, direction, count)
     " check if we have comments or not 
     let has_comments = s:HasComments(beg, until)
     if (has_comments == 1)
-        let regex = " s/^#//"
+        let regex = ' s/^\/\///'
         let until = s:LastComment(beg)
     else
-        let regex = " s/^/#/"
+        let regex = ' s/^/\/\//'
     endif
         
     if line_moves > 0
@@ -164,7 +149,7 @@ endfunction
 
 " Find if a Range has comments or not 
 function! s:HasComments(from, until)
-    let regex =  's/^#//gn'
+    let regex =  's/^\/\///gn'
     try 
         silent exe a:from . "," . a:until . regex
         return 1
@@ -176,20 +161,20 @@ endfunction
 " Find the last commented line 
 function! s:LastComment(from_line)
     let line = a:from_line
-    while ((getline(line) =~ '^\s*#') && (line <= line('$')))
+    while ((getline(line) =~ '^\s*\/\/') && (line <= line('$')))
         let line = line+1
     endwhile 
     return line 
 endfunction
 
 " Select an object ("class"/"function")
-function! s:RubySelectObject(obj, direction, count)
+function! s:PythonSelectObject(obj, direction, count)
     let orig_line = line('.')
     let orig_col = col('.')
 
     " Go to the object declaration
     normal $
-    let go_to_obj = s:FindRubyObject(a:obj, a:direction, a:count)
+    let go_to_obj = s:FindPythonObject(a:obj, a:direction, a:count)
         
     if (! go_to_obj)
         exec orig_line
@@ -197,9 +182,16 @@ function! s:RubySelectObject(obj, direction, count)
         return
     endif
 
-    let beg = line('.')
+    " Sometimes, when we get a decorator we are not in the line we want 
+    let has_decorator = s:HasPythonDecorator(line('.'))
 
-    let until = s:NextEnd(1, a:obj)
+    if has_decorator 
+        let beg = has_decorator 
+    else 
+        let beg = line('.')
+    endif
+
+    let until = s:NextIndent(1)
 
     " go to the line we need
     exec beg
@@ -213,70 +205,40 @@ function! s:RubySelectObject(obj, direction, count)
 endfunction
 
 
-function! s:NextEnd(fwd, obj)
+function! s:NextIndent(fwd)
     let line = line('.')
     let column = col('.')
     let lastline = line('$')
+    let indent = indent(line)
     let stepvalue = a:fwd ? 1 : -1
-    
-    if (a:obj == "class")
-        let c_class = 1 
+
+    let o_regex = '\v^\s*\{\s*'
+    let c_regex = '\v^\s*\}\s*'
+
+    let c_open = 1
+    if (getline(line) =~ c_regex)
+        let c_close = 1 
     else
-        let c_class = 0
+        let c_close = 0
     endif
 
-    if (a:obj == "method")
-        let c_method = 1
-    else
-        let c_method = 0
-    endif
-
-    if (a:obj == "function")
-        let c_function = 1 
-    else
-        let c_function = 0
-    endif
-
-    if (a:obj == "module")
-        let c_module = 1
-    else 
-        let c_module = 0
-    endif
-
-    let c_end = 0
     let found = 0
     let matched = 0
     while ((line > 0) && (line <= lastline) && (found == 0))
         let line = line + 1
-        if (getline(line) =~ '\v^\s*(.*class)\s+(\w+)\s*&(.*end)@!')
-            let c_class = c_class + 1
-        elseif (getline(line) =~ '\v^\s*(.*def)\s+(self*)\s*&(.*end)@!')
-            let c_method = c_method + 1
-        elseif (getline(line) =~ '\v^\s*(.*module)\s+(\w+)\s*&(.*end)@!')
-            let c_module = c_module + 1
-        elseif (getline(line) =~ '\v^\s*(.*def)\s+&(.*self)@!&(.*end)@!')
-            let c_function = c_function + 1
+        if (getline(line) =~ o_regex)
+            let c_open = c_open + 1
+        endif 
 
-        " Match keywords that trigger `end` in Ruby 
-        " if else while until do for 
-    "elseif (getline(line) =~ '\v^\s+(if|else|while|until|do|for)\s+')
-    elseif (getline(line) =~ '\v^\s+if\s+')
-            let c_end = c_end -1
-    elseif (getline(line) =~ '\v^\s+unless\s+')
-            let c_end = c_end -1
-    elseif (getline(line) =~ '\v\s+do\s+')
-            let c_end = c_end -1
-        endif            
-
-
-        if (getline(line) =~ '\v^\s*end\s*')
-            let c_end = c_end + 1
-            if (c_class + c_method + c_function + c_module == c_end)
+        if (getline(line) =~ c_regex)
+            let c_close = c_close + 1
+            if (c_open == c_close) 
                 return line 
                 let found = 1 
-            endif 
+            endif
         endif
     endwhile
+
 endfunction
  
 
@@ -284,24 +246,22 @@ endfunction
 " return a line number that matches either a class or a function
 " to call this manually:
 " Backwards:
-"     :call FindRubyObject("class", -1)
+"     :call FindPythonObject("class", -1)
 " Forwards:
-"     :call FindRubyObject("class")
+"     :call FindPythonObject("class")
 " Functions Backwards:
-"     :call FindRubyObject("function", -1)
+"     :call FindPythonObject("function", -1)
 " Functions Forwards:
-"     :call FindRubyObject("function")
-function! s:FindRubyObject(obj, direction, count)
+"     :call FindPythonObject("function")
+function! s:FindPythonObject(obj, direction, count)
     let orig_line = line('.')
     let orig_col = col('.')
     if (a:obj == "class")
-        let objregexp  = '\v^\s*(.*class)\s+(\w+)\s*&(.*end)@!'
+        let objregexp  = '\v^\s*(.*class)\s+(\w+)\s*\(\s*'
     elseif (a:obj == "method")
-        let objregexp = '\v^\s*(.*def)\s+(self*)\s*&(.*end)@!'
-    elseif (a:obj == "module")
-        let objregexp = '\v^\s*(.*module)\s+(\w+)\s*&(.*end)@!'
+        let objregexp = '\v^\s*(.*def)\s+(\w+)\s*\(\s*(self[^)]*)'
     else
-        let objregexp = '\v^\s*(.*def)\s+&(.*self)@!&(.*end)@!'
+        let objregexp = '\v^\s*(.*function\()\s*\)\s*\{'
     endif
     let flag = "W"
     if (a:direction == -1)
@@ -329,6 +289,23 @@ function! s:FindRubyObject(obj, direction, count)
 endfunction
 
 
+"function! s:HasPythonDecorator(line)
+"    " Get to the previous line where the decorator lives
+"    let line = a:line -1 
+"    while (getline(line) =~ '\v^(.*\@[a-zA-Z])')
+"        let line = line - 1
+"    endwhile
+"
+"    " This is tricky but goes back and forth to 
+"    " correctly match the decorator without the 
+"    " possibility of selecting a blank line
+"    if (getline(line) =~ '\v^(.*\@[a-zA-Z])')
+"        return line
+"    elseif (getline(line+1) =~ '\v^(.*\@[a-zA-Z])')
+"        return line + 1
+"    endif
+"endfunction
+
 function! s:IsInside(object)
     let beg = line('.')
     let column = col('.')
@@ -341,8 +318,6 @@ function! s:IsInside(object)
     exe beg 
     let function = s:PreviousObjectLine("function")
     exe beg 
-    let module = s:PreviousObjectLine("module")
-    exe beg
     exe "normal " column . "|"
 
     if (a:object == "function")
@@ -369,27 +344,17 @@ function! s:IsInside(object)
         else 
             return 0
         endif 
-    elseif (a:object == "module")
-        if (module == -1)
-            return -1
-        elseif ((function < module) && (class < module))
-            return 1
-        else 
-            return 0
-        endif
     endif 
 endfunction 
 
 function! s:PreviousObjectLine(obj)
     let beg = line('.')
     if (a:obj == "class")
-        let objregexp  = '\v^\s*(.*class)\s+(\w+)\s*'
-    elseif (a:obj == "module")
-        let objregexp = '\v^\s*(.*module)\s+(\w+)\s*'
+        let objregexp  = '\v^\s*(.*class)\s+(\w+)\s*\(\s*'
     elseif (a:obj == "method")
-        let objregexp = '\v^\s*(.*def)\s+(self*)\s*'
+        let objregexp = '\v^\s*(.*def)\s+(\w+)\s*\(\s*(self[^)]*)'
     else
-        let objregexp = '\v^\s*(.*def)&(.*self)@!'
+        let objregexp = '\v^\s*(.*function\()\s*\)\s*\{'
     endif
 
     let flag = 'Wb' 
@@ -421,19 +386,19 @@ endfunction
 function! s:CommentPreviousClass()
     let inside = s:IsInside("class")
     let times = v:count1+inside
-    if (! s:RubyCommentObject("class", -1, times))
+    if (! s:PythonCommentObject("class", -1, times))
         call s:Echo("Could not match previous class for commenting")
     endif 
 endfunction
 
 function! s:CommentNextClass()
-    if (! s:RubyCommentObject("class", 1, v:count1))
+    if (! s:PythonCommentObject("class", 1, v:count1))
         call s:Echo("Could not match next class for commenting")
     endif 
 endfunction
 
 function! s:CommentThisClass()
-    if (! s:RubyCommentObject("class", -1, 1))
+    if (! s:PythonCommentObject("class", -1, 1))
         call s:Echo("Could not match inside of class for commenting")
     endif 
 endfunction
@@ -444,19 +409,19 @@ endfunction
 function! s:CommentPreviousMethod()
     let inside = s:IsInside("method")
     let times = v:count1+inside
-    if (! s:RubyCommentObject("method", -1, times))
+    if (! s:PythonCommentObject("method", -1, times))
         call s:Echo("Could not match previous method for commenting")
     endif 
 endfunction
 
 function! s:CommentNextMethod()
-    if (! s:RubyCommentObject("method", 1, v:count1))
+    if (! s:PythonCommentObject("method", 1, v:count1))
         call s:Echo("Could not match next method for commenting")
     endif 
 endfunction
 
 function! s:CommentThisMethod()
-    if (! s:RubyCommentObject("method", -1, 1))
+    if (! s:PythonCommentObject("method", -1, 1))
         call s:Echo("Could not match inside of method for commenting")
     endif 
 endfunction
@@ -467,53 +432,29 @@ endfunction
 function! s:CommentPreviousFunction()
     let inside = s:IsInside("function")
     let times = v:count1+inside
-    if (! s:RubyCommentObject("function", -1, times))
+    if (! s:PythonCommentObject("function", -1, times))
         call s:Echo("Could not match previous function for commenting")
     endif 
 endfunction
 
 function! s:CommentNextFunction()
-    if (! s:RubyCommentObject("function", 1, v:count1))
+    if (! s:PythonCommentObject("function", 1, v:count1))
         call s:Echo("Could not match next function for commenting")
     endif 
 endfunction
 
 function! s:CommentThisFunction()
-    if (! s:RubyCommentObject("function", -1, 1))
+    if (! s:PythonCommentObject("function", -1, 1))
         call s:Echo("Could not match inside of function for commenting")
     endif 
 endfunction
-
-"
-" Comment Module Selections:
-"
-function! s:CommentPreviousModule()
-    let inside = s:IsInside("module")
-    let times = v:count1+inside
-    if (! s:RubyCommentObject("module", -1, times))
-        call s:Echo("Could not match previous module for commenting")
-    endif 
-endfunction
-
-function! s:CommentNextModule()
-    if (! s:RubyCommentObject("module", 1, v:count1))
-        call s:Echo("Could not match next module for commenting")
-    endif 
-endfunction
-
-function! s:CommentThisModule()
-    if (! s:RubyCommentObject("module", -1, 1))
-        call s:Echo("Could not match inside of module for commenting")
-    endif 
-endfunction
-
 
 "
 " Visual Selections:
 "
 " Visual Class Selections:
 function! s:VisualNextClass()
-    if (! s:RubySelectObject("class", 1, v:count1))
+    if (! s:PythonSelectObject("class", 1, v:count1))
         call s:Echo("Could not match next class for visual selection")
     endif
 endfunction
@@ -521,13 +462,13 @@ endfunction
 function! s:VisualPreviousClass()
     let inside = s:IsInside("class")
     let times = v:count1+inside
-    if (! s:RubySelectObject("class", -1, times))
+    if (! s:PythonSelectObject("class", -1, times))
         call s:Echo("Could not match previous class for visual selection")
     endif 
 endfunction
 
 function! s:VisualThisClass()
-    if (! s:RubySelectObject("class", -1, 1))
+    if (! s:PythonSelectObject("class", -1, 1))
         call s:Echo("Could not match inside of class for visual selection")
     endif 
 endfunction
@@ -535,7 +476,7 @@ endfunction
 
 " Visual Function Selections:
 function! s:VisualNextFunction()
-    if (! s:RubySelectObject("function", 1, v:count1))
+    if (! s:PythonSelectObject("function", 1, v:count1))
         call s:Echo("Could not match next function for visual selection")
     endif
 endfunction
@@ -543,20 +484,20 @@ endfunction
 function! s:VisualPreviousFunction()
     let inside = s:IsInside("function")
     let times = v:count1+inside
-    if (! s:RubySelectObject("function", -1, times))
+    if (! s:PythonSelectObject("function", -1, times))
         call s:Echo("Could not match previous function for visual selection")
     endif 
 endfunction
 
 function! s:VisualThisFunction()
-    if (! s:RubySelectObject("function", -1, 1))
+    if (! s:PythonSelectObject("function", -1, 1))
         call s:Echo("Could not match inside of function for visual selection")
     endif 
 endfunction
 
 " Visual Method Selections:
 function! s:VisualNextMethod()
-    if (! s:RubySelectObject("method", 1, v:count1))
+    if (! s:PythonSelectObject("method", 1, v:count1))
         call s:Echo("Could not match next method for visual selection")
     endif
 endfunction
@@ -564,38 +505,16 @@ endfunction
 function! s:VisualPreviousMethod()
     let inside = s:IsInside("method")
     let times = v:count1+inside
-    if (! s:RubySelectObject("method", -1, times))
+    if (! s:PythonSelectObject("method", -1, times))
         call s:Echo("Could not match previous method for visual selection")
     endif 
 endfunction
 
 function! s:VisualThisMethod()
-    if (! s:RubySelectObject("method", -1, 1))
+    if (! s:PythonSelectObject("method", -1, 1))
         call s:Echo("Could not match inside of method for visual selection")
     endif 
 endfunction
-
-" Visual Module Selections:
-function! s:VisualNextModule()
-    if (! s:RubySelectObject("module", 1, v:count1))
-        call s:Echo("Could not match next module for visual selection")
-    endif
-endfunction
-
-function! s:VisualPreviousModule()
-    let inside = s:IsInside("module")
-    let times = v:count1+inside
-    if (! s:RubySelectObject("module", -1, times))
-        call s:Echo("Could not match previous module for visual selection")
-    endif 
-endfunction
-
-function! s:VisualThisModule()
-    if (! s:RubySelectObject("module", -1, 1))
-        call s:Echo("Could not match inside of module for visual selection")
-    endif 
-endfunction
-
 
 " 
 " Movements:
@@ -607,7 +526,7 @@ function! s:PreviousClass(record)
     endif
     let inside = s:IsInside("class")
     let times = v:count1+inside
-    if (! s:FindRubyObject("class", -1, times))
+    if (! s:FindPythonObject("class", -1, times))
         call s:Echo("Could not match previous class")
     endif 
 endfunction 
@@ -616,7 +535,7 @@ function! s:NextClass(record)
     if (a:record == 1)
         let g:chapa_last_action = "s:NextClass(0)"
     endif
-    if (! s:FindRubyObject("class", 1, v:count1))
+    if (! s:FindPythonObject("class", 1, v:count1))
         call s:Echo("Could not match next class")
     endif 
 endfunction 
@@ -628,7 +547,7 @@ function! s:PreviousMethod(record)
     endif
     let inside = s:IsInside("method")
     let times = v:count1+inside
-    if (! s:FindRubyObject("method", -1, times))
+    if (! s:FindPythonObject("method", -1, times))
         call s:Echo("Could not match previous method")
     endif 
 endfunction 
@@ -637,7 +556,7 @@ function! s:NextMethod(record)
     if (a:record == 1)
         let g:chapa_last_action = "s:NextMethod(0)"
     endif
-    if (! s:FindRubyObject("method", 1, v:count1))
+    if (! s:FindPythonObject("method", 1, v:count1))
         call s:Echo("Could not match next method")
     endif 
 endfunction 
@@ -649,7 +568,7 @@ function! s:PreviousFunction(record)
     endif
     let inside = s:IsInside("function")
     let times = v:count1+inside
-    if (! s:FindRubyObject("function", -1, times))
+    if (! s:FindPythonObject("function", -1, times))
         call s:Echo("Could not match previous function")
     endif 
 endfunction
@@ -658,29 +577,8 @@ function! s:NextFunction(record)
     if (a:record == 1)
         let g:chapa_last_action = "s:NextFunction(0)"
     endif
-    if (! s:FindRubyObject("function", 1, v:count1))
+    if (! s:FindPythonObject("function", 1, v:count1))
         call s:Echo("Could not match next function")
-    endif 
-endfunction
-
-" Module:
-function! s:PreviousModule(record)
-    if (a:record == 1)
-        let g:chapa_last_action = "s:PreviousModule(0)"
-    endif
-    let inside = s:IsInside("module")
-    let times = v:count1+inside
-    if (! s:FindRubyObject("module", -1, times))
-        call s:Echo("Could not match previous module")
-    endif 
-endfunction
-        
-function! s:NextModule(record)
-    if (a:record == 1)
-        let g:chapa_last_action = "s:NextModule(0)"
-    endif
-    if (! s:FindRubyObject("module", 1, v:count1))
-        call s:Echo("Could not match next module")
     endif 
 endfunction
 "}}}
@@ -701,11 +599,6 @@ nnoremap <silent> <Plug>ChapaCommentPreviousFunction   :<C-U>call <SID>CommentPr
 nnoremap <silent> <Plug>ChapaCommentNextFunction       :<C-U>call <SID>CommentNextFunction()      <CR>
 nnoremap <silent> <Plug>ChapaCommentThisFunction       :<C-U>call <SID>CommentThisFunction()      <CR>
 
-" Comment Module: 
-nnoremap <silent> <Plug>ChapaCommentPreviousModule   :<C-U>call <SID>CommentPreviousModule()  <CR>
-nnoremap <silent> <Plug>ChapaCommentNextModule       :<C-U>call <SID>CommentNextModule()      <CR>
-nnoremap <silent> <Plug>ChapaCommentThisModule       :<C-U>call <SID>CommentThisModule()      <CR>
-
 " Visual Select Class:
 nnoremap <silent> <Plug>ChapaVisualNextClass        :<C-U>call <SID>VisualNextClass()       <CR>
 nnoremap <silent> <Plug>ChapaVisualPreviousClass    :<C-U>call <SID>VisualPreviousClass()   <CR>
@@ -721,11 +614,6 @@ nnoremap <silent> <Plug>ChapaVisualNextFunction     :<C-U>call <SID>VisualNextFu
 nnoremap <silent> <Plug>ChapaVisualPreviousFunction :<C-U>call <SID>VisualPreviousFunction()<CR>
 nnoremap <silent> <Plug>ChapaVisualThisFunction     :<C-U>call <SID>VisualThisFunction()    <CR>
 
-" Visual Select Module:
-nnoremap <silent> <Plug>ChapaVisualNextModule       :<C-U>call <SID>VisualNextModule()      <CR>
-nnoremap <silent> <Plug>ChapaVisualPreviousModule   :<C-U>call <SID>VisualPreviousModule()  <CR>
-nnoremap <silent> <Plug>ChapaVisualThisModule       :<C-U>call <SID>VisualThisModule()      <CR>
-
 " Class Movement:
 nnoremap <silent> <Plug>ChapaPreviousClass          :<C-U>call <SID>PreviousClass(1)        <CR>
 nnoremap <silent> <Plug>ChapaNextClass              :<C-U>call <SID>NextClass(1)            <CR>
@@ -737,10 +625,6 @@ nnoremap <silent> <Plug>ChapaNextMethod             :<C-U>call <SID>NextMethod(1
 " Function Movement:
 nnoremap <silent> <Plug>ChapaPreviousFunction       :<C-U>call <SID>PreviousFunction(1)     <CR>
 nnoremap <silent> <Plug>ChapaNextFunction           :<C-U>call <SID>NextFunction(1)         <CR>
-
-" Module Movement:
-nnoremap <silent> <Plug>ChapaPreviousModule         :<C-U>call <SID>PreviousModule(1)       <CR>
-nnoremap <silent> <Plug>ChapaNextModule             :<C-U>call <SID>NextModule(1)           <CR>
 
 " Repeating Movements:
 nnoremap <silent> <Plug>ChapaOppositeRepeat         :<C-U>call <SID>BackwardRepeat()        <CR>
