@@ -8,6 +8,8 @@ or comment (or toggle) out the next/previous N class, function or method.
 
 As this is a "file-type plugin", it currently supports both Python and Ruby.
 
+Watch the screencast: http://vimeo.com/19016562
+
 Installation couldn't be easier: drop the ftplugin file in your vim ftplugin 
 directory. For example, if you are using Python, this would be something like::
 
