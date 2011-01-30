@@ -16,14 +16,17 @@ endif
 if (exists('g:chapa_default_mappings'))
     " Function Movement
     nmap fnf <Plug>ChapaNextFunction
+    nmap fif <Plug>ChapaInFunction
     nmap fpf <Plug>ChapaPreviousFunction
 
     " Class Movement
     nmap fnc <Plug>ChapaNextClass
+    nmap fic <Plug>ChapaInClass
     nmap fpc <Plug>ChapaPreviousClass
 
     " Method Movement
     nmap fnm <Plug>ChapaNextMethod
+    nmap fim <Plug>ChapaInMethod
     nmap fpm <Plug>ChapaPreviousMethod
 
     " Class Visual Select 
@@ -134,6 +137,7 @@ function! s:PythonCommentObject(obj, direction, count)
 
     " go to the line we need
     exec beg
+
     let line_moves = until - beg
 
     " check if we have comments or not 
@@ -212,6 +216,24 @@ function! s:PythonSelectObject(obj, direction, count)
 endfunction
 
 
+function! s:NextUncommentedLine(fwd)
+    let line = line('.')
+    let column = col('.')
+    let lastline = line('$')
+    let indent = indent(line)
+    let stepvalue = a:fwd ? 1 : -1
+
+    let found = 0
+    while ((line > 0) && (line <= lastline) && (found == 0) && (getline(line) =~ '^#'))
+        let line = line + 1
+        if (getline(line) !~ '^#')
+            let found = 1
+            return line - 1
+        endif
+    endwhile
+endfunction
+
+
 function! s:NextIndent(fwd)
     let line = line('.')
     let column = col('.')
@@ -219,6 +241,10 @@ function! s:NextIndent(fwd)
     let indent = indent(line)
     let stepvalue = a:fwd ? 1 : -1
 
+    if (getline(line) =~ '^#')
+        let until = s:NextUncommentedLine(1)
+        return until
+    endif
     " We look for the last non whitespace 
     " line (e.g. another function at same indent level
     " and then go back until we find an indent that 
@@ -541,6 +567,12 @@ function! s:PreviousClass(record)
     endif 
 endfunction 
 
+function! s:InClass()
+    if (! s:FindPythonObject("class", -1, 1))
+        call s:Echo("Could not match insode of class")
+    endif 
+endfunction 
+
 function! s:NextClass(record)
     if (a:record == 1)
         let g:chapa_last_action = "s:NextClass(0)"
@@ -559,6 +591,12 @@ function! s:PreviousMethod(record)
     let times = v:count1+inside
     if (! s:FindPythonObject("method", -1, times))
         call s:Echo("Could not match previous method")
+    endif 
+endfunction 
+
+function! s:InMethod()
+    if (! s:FindPythonObject("method", -1, 1))
+        call s:Echo("Could not match inside of method")
     endif 
 endfunction 
 
@@ -582,7 +620,13 @@ function! s:PreviousFunction(record)
         call s:Echo("Could not match previous function")
     endif 
 endfunction
-        
+
+function! s:InFunction()
+    if (! s:FindPythonObject("function", -1, 1))
+        call s:Echo("Could not match inside of function")
+    endif 
+endfunction
+
 function! s:NextFunction(record)
     if (a:record == 1)
         let g:chapa_last_action = "s:NextFunction(0)"
@@ -626,14 +670,17 @@ nnoremap <silent> <Plug>ChapaVisualThisFunction     :<C-U>call <SID>VisualThisFu
 
 " Class Movement:
 nnoremap <silent> <Plug>ChapaPreviousClass          :<C-U>call <SID>PreviousClass(1)        <CR>
+nnoremap <silent> <Plug>ChapaInClass                :<C-U>call <SID>InClass()               <CR>
 nnoremap <silent> <Plug>ChapaNextClass              :<C-U>call <SID>NextClass(1)            <CR>
 
 " Method Movement:
 nnoremap <silent> <Plug>ChapaPreviousMethod         :<C-U>call <SID>PreviousMethod(1)       <CR>
+nnoremap <silent> <Plug>ChapaInMethod               :<C-U>call <SID>InMethod()              <CR>
 nnoremap <silent> <Plug>ChapaNextMethod             :<C-U>call <SID>NextMethod(1)           <CR>
 
 " Function Movement:
 nnoremap <silent> <Plug>ChapaPreviousFunction       :<C-U>call <SID>PreviousFunction(1)     <CR>
+nnoremap <silent> <Plug>ChapaInFunction             :<C-U>call <SID>InFunction()            <CR>
 nnoremap <silent> <Plug>ChapaNextFunction           :<C-U>call <SID>NextFunction(1)         <CR>
 
 " Repeating Movements:
