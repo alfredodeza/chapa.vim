@@ -104,7 +104,6 @@ function! s:JSCommentObject(obj, direction, count)
     let has_comments = s:HasComments(beg, until)
     if (has_comments == 1)
         let regex = ' s/^\/\///'
-        let until = s:LastComment(beg)
     else
         let regex = ' s/^/\/\//'
     endif
