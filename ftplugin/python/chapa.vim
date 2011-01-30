@@ -155,6 +155,7 @@ function! s:PythonCommentObject(obj, direction, count)
         execute "%" . regex
     endif
     let @/ = ""
+
     return 1
 endfunction
 
@@ -172,10 +173,8 @@ endfunction
 " Find the last commented line 
 function! s:LastComment(from_line)
     let line = a:from_line
-    while ((getline(line) =~ '^\s*#') && (line <= line('$')))
-        let line = line+1
-    endwhile 
-    return line 
+    exe line
+    return s:NextUncommentedLine(1)
 endfunction
 
 " Select an object ("class"/"function")
@@ -224,9 +223,14 @@ function! s:NextUncommentedLine(fwd)
     let stepvalue = a:fwd ? 1 : -1
 
     let found = 0
-    while ((line > 0) && (line <= lastline) && (found == 0) && (getline(line) =~ '^#'))
-        let line = line + 1
-        if (getline(line) !~ '^#')
+    while ((line > 0) && (line <= lastline) && (found == 0)) 
+        if (getline(line) =~ '^#')
+            let line = line + 1
+            if (line == lastline)
+                return lastline
+            endif
+
+        elseif (getline(line) !~ '^#')
             let found = 1
             return line - 1
         endif
