@@ -62,6 +62,21 @@ if (exists('g:chapa_default_mappings'))
     " Repeat Mappings
     nmap <C-h> <Plug>ChapaOppositeRepeat
     nmap <C-l> <Plug>ChapaRepeat
+
+    " Folding Method
+    nmap zim <Plug>ChapaFoldThisMethod
+    nmap znm <Plug>ChapaFoldNextMethod
+    nmap zpm <Plug>ChapaPreviousMethod
+
+    " Folding Class
+    nmap zic <Plug>ChapaFoldThisClass
+    nmap znc <Plug>ChapaFoldNextClass
+    nmap zpc <Plug>ChapaFoldPreviousClass
+
+    " Folding Function
+    nmap zif <Plug>ChapaFoldThisFunction
+    nmap znf <Plug>ChapaFoldNextFunction
+    nmap zpf <Plug>ChapaFoldPreviousFunction
 endif
 
 "{{{ Helpers
@@ -78,6 +93,26 @@ function! s:Echo(msg)
     let &ruler=x | let &showcmd=y
   endif
 endfun
+
+
+" Set the fold title right if we have a decorator
+set foldtext=ChapaFoldText()
+set foldmethod=manual
+function! ChapaFoldText()
+    let line = getline(v:foldstart)
+    if (line =~ '\v^\s*\@')
+        let decorator_line = v:foldstart + 1
+        while (getline(decorator_line) =~ '\v^\s*\@')
+            let decorator_line = decorator_line + 1
+        endwhile
+        let title = getline(decorator_line)
+    else
+        let title = line
+    endif
+    let fold_title = substitute(title,"^\\s\\+\\|\\s\\+$","","g") 
+    return v:folddashes . fold_title
+endfunction
+
 
 " Wouldn't it be nice if you could just repeat the effing Movements
 " instead of typing mnemonics to keep going forward or backwards?
@@ -639,6 +674,80 @@ function! s:NextFunction(record)
         call s:Echo("Could not match next function")
     endif 
 endfunction
+
+"
+" Folding:
+" 
+
+" Method:
+function! s:FoldThisMethod()
+    call s:PythonSelectObject("method", -1, 1)
+    exe "normal zf"
+endfunction
+
+function! s:FoldPreviousMethod()
+    let inside = s:IsInside("method")
+    let times = v:count1+inside
+    if (! s:FindPythonObject("method", -1, times))
+        call s:Echo("Could not match previous method for folding")
+    endif 
+    exe "normal zf"
+endfunction
+
+function! s:FoldNextMethod()
+    if (! s:PythonSelectObject("method", 1, v:count1))
+        call s:Echo("Could not match next method for folding")
+    endif 
+    exe "normal zf"
+endfunction
+
+
+" Class:
+function! s:FoldThisClass()
+    call s:PythonSelectObject("class", -1, 1)
+    exe "normal zf"
+endfunction
+
+function! s:FoldPreviousClass()
+    let inside = s:IsInside("class")
+    let times = v:count1+inside
+    if (! s:FindPythonObject("class", -1, times))
+        call s:Echo("Could not match previous class for folding")
+    endif 
+    exe "normal zf"
+endfunction
+
+function! s:FoldNextClass()
+    if (! s:PythonSelectObject("class", 1, v:count1))
+        call s:Echo("Could not match next class for folding")
+    endif 
+    exe "normal zf"
+endfunction
+
+
+" Function:
+function! s:FoldThisFunction()
+    if (! s:PythonSelectObject("function", -1, 1))
+        call s:Echo("Could not match inside of function for folding")
+    endif 
+    exe "normal zf"
+endfunction
+
+function! s:FoldPreviousFunction()
+    let inside = s:IsInside("function")
+    let times = v:count1+inside
+    if (! s:FindPythonObject("function", -1, times))
+        call s:Echo("Could not match previous function for folding")
+    endif 
+    exe "normal zf"
+endfunction
+
+function! s:FoldNextFunction()
+    if (! s:PythonSelectObject("function", 1, v:count1))
+        call s:Echo("Could not match next function for folding")
+    endif 
+    exe "normal zf"
+endfunction
 "}}}
 
 "{{{ Misc 
@@ -690,4 +799,20 @@ nnoremap <silent> <Plug>ChapaNextFunction           :<C-U>call <SID>NextFunction
 " Repeating Movements:
 nnoremap <silent> <Plug>ChapaOppositeRepeat         :<C-U>call <SID>BackwardRepeat()        <CR>
 nnoremap <silent> <Plug>ChapaRepeat                 :<C-U>call <SID>Repeat()                <CR>
+
+" Folding Method:
+nnoremap <silent> <Plug>ChapaFoldThisMethod         :<C-U>call <SID>FoldThisMethod()        <CR>
+nnoremap <silent> <Plug>ChapaFoldNextMethod         :<C-U>call <SID>FoldNextMethod()        <CR>
+nnoremap <silent> <Plug>ChapaFoldPreviousMethod     :<C-U>call <SID>FoldPreviousMethod()    <CR>
+
+" Folding Class:
+nnoremap <silent> <Plug>ChapaFoldThisClass          :<C-U>call <SID>FoldThisClass()         <CR>
+nnoremap <silent> <Plug>ChapaFoldNextClass          :<C-U>call <SID>FoldNextClass()         <CR>
+nnoremap <silent> <Plug>ChapaFoldPreviousClass      :<C-U>call <SID>FoldPreviousClass()     <CR>
+
+" Fold Function:
+nnoremap <silent> <Plug>ChapaFoldThisFunction       :<C-U>call <SID>FoldThisFunction()      <CR>
+nnoremap <silent> <Plug>ChapaFoldNextFunction       :<C-U>call <SID>FoldNextFunction()      <CR>
+nnoremap <silent> <Plug>ChapaFoldPreviousFunction   :<C-U>call <SID>FoldPreviousFunction()  <CR>
+
 "}}}
