@@ -168,7 +168,7 @@ function! s:PythonCommentObject(obj, direction, count)
         let beg = line('.')
     endif
 
-    let until = s:NextIndent()
+    let until = s:NextIndent("comments")
 
     " go to the line we need
     exec beg
@@ -184,6 +184,10 @@ function! s:PythonCommentObject(obj, direction, count)
         let regex = " s/^/#/"
     endif
         
+    echo "Beginning " . beg
+    echo "Until " . until
+    echo "Has comments " . has_comments
+    echo "Regex " . regex
     if line_moves > 0
         execute beg . "," . until . regex
     else
@@ -327,7 +331,7 @@ function! s:NextUncommentedLine(fwd)
     endwhile
 endfunction
 
-function! s:NextIndent()
+function! s:NextIndent(...)
     let line = line('.')
     let column = col('.')
     let lastline = line('$')
@@ -347,7 +351,7 @@ function! s:NextIndent()
     while ((line > 0) && (line <= lastline) && (found == 0))
 
         " if we find a fold
-        if (foldclosed(line) != -1)
+        if ((foldclosed(line) != -1) && (a:0 == 0))
             let foldStart = foldclosed(line)
             let foldEnd = foldclosedend(line)
             let folds = foldEnd - foldStart
