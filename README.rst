@@ -89,6 +89,20 @@ defaults are mapped::
     nmap <C-h> <Plug>ChapaOppositeRepeat
     nmap <C-l> <Plug>ChapaRepeat
 
+    " Folding Method
+    nmap zim <Plug>ChapaFoldThisMethod
+    nmap znm <Plug>ChapaFoldNextMethod
+    nmap zpm <Plug>ChapaFoldPreviousMethod
+
+    " Folding Class
+    nmap zic <Plug>ChapaFoldThisClass
+    nmap znc <Plug>ChapaFoldNextClass
+    nmap zpc <Plug>ChapaFoldPreviousClass
+
+    " Folding Function
+    nmap zif <Plug>ChapaFoldThisFunction
+    nmap znf <Plug>ChapaFoldNextFunction
+    nmap zpf <Plug>ChapaFoldPreviousFunction
 
     """""""""""""""""""""""""""""""""""""""""""""
     " Ruby-Only Section
