@@ -66,7 +66,7 @@ if (exists('g:chapa_default_mappings'))
     " Folding Method
     nmap zim <Plug>ChapaFoldThisMethod
     nmap znm <Plug>ChapaFoldNextMethod
-    nmap zpm <Plug>ChapaPreviousMethod
+    nmap zpm <Plug>ChapaFoldPreviousMethod
 
     " Folding Class
     nmap zic <Plug>ChapaFoldThisClass
@@ -228,7 +228,7 @@ endfunction
 
 
 " Folding actions for methods, classes or functions
-function! PythonFoldObject(obj, direction, count)
+function! s:PythonFoldObject(obj, direction, count)
     let orig_line = line('.')
     let orig_col = col('.')
 
@@ -259,9 +259,6 @@ function! PythonFoldObject(obj, direction, count)
     exec beg
     let line_moves = until - beg
 
-    echo "Beg " . beg
-    echo "Until " . until
-    echo "Line Moves " . line_moves
     if line_moves > 0
         execute "normal V" . line_moves . "j"
     else
@@ -331,6 +328,7 @@ function! s:NextUncommentedLine(fwd)
     endwhile
 endfunction
 
+
 function! s:NextIndent(...)
     let line = line('.')
     let column = col('.')
@@ -355,8 +353,8 @@ function! s:NextIndent(...)
             let foldStart = foldclosed(line)
             let foldEnd = foldclosedend(line)
             let folds = foldEnd - foldStart
-            let folded_lines = folded_lines + folds
-            let line = foldEnd + 1 
+            let folded_lines = folded_lines + folds 
+            let line = foldEnd + 1
         else
             let line = line + 1 
         endif
@@ -366,11 +364,10 @@ function! s:NextIndent(...)
                 let go_back = go_back-1 
                 if (getline(go_back) !~ '^\s*$')
                     break 
-                    let found = 1
                 endif
             endwhile
-            let found = 1
             return go_back - folded_lines
+            let found = 1
 
         " what if we reach end of file and no dice? 
         elseif (line == lastline)
@@ -751,31 +748,31 @@ endfunction
 
 " Method:
 function! s:FoldThisMethod()
-    call s:PythonSelectObject("method", -1, 1)
-    exe "normal zf"
+    if (! s:PythonFoldObject("method", -1, 1))
+        call s:Echo("Could not match inside of method for folding")
+    endif
 endfunction
 
 function! s:FoldPreviousMethod()
     let inside = s:IsInside("method")
     let times = v:count1+inside
-    if (! s:FindPythonObject("method", -1, times))
+    if (! s:PythonFoldObject("method", -1, times))
         call s:Echo("Could not match previous method for folding")
     endif 
-    exe "normal zf"
 endfunction
 
 function! s:FoldNextMethod()
-    if (! s:PythonSelectObject("method", 1, v:count1))
+    if (! s:PythonFoldObject("method", 1, v:count1))
         call s:Echo("Could not match next method for folding")
     endif 
-    exe "normal zf"
 endfunction
 
 
 " Class:
 function! s:FoldThisClass()
-    call s:PythonSelectObject("class", -1, 1)
-    exe "normal zf"
+    if (! s:PythonFoldObject("class", -1, 1))
+        call s:Echo("Could not match inside of class for folding.")
+    endif
 endfunction
 
 function! s:FoldPreviousClass()
@@ -784,39 +781,34 @@ function! s:FoldPreviousClass()
     if (! s:FindPythonObject("class", -1, times))
         call s:Echo("Could not match previous class for folding")
     endif 
-    exe "normal zf"
 endfunction
 
 function! s:FoldNextClass()
-    if (! s:PythonSelectObject("class", 1, v:count1))
+    if (! s:PythonFoldObject("class", 1, v:count1))
         call s:Echo("Could not match next class for folding")
     endif 
-    exe "normal zf"
 endfunction
 
 
 " Function:
 function! s:FoldThisFunction()
-    if (! s:PythonSelectObject("function", -1, 1))
+    if (! s:PythonFoldObject("function", -1, 1))
         call s:Echo("Could not match inside of function for folding")
     endif 
-    exe "normal zf"
 endfunction
 
 function! s:FoldPreviousFunction()
     let inside = s:IsInside("function")
     let times = v:count1+inside
-    if (! s:FindPythonObject("function", -1, times))
+    if (! s:PythonFoldObject("function", -1, times))
         call s:Echo("Could not match previous function for folding")
     endif 
-    exe "normal zf"
 endfunction
 
 function! s:FoldNextFunction()
-    if (! s:PythonSelectObject("function", 1, v:count1))
+    if (! s:PythonFoldObject("function", 1, v:count1))
         call s:Echo("Could not match next function for folding")
     endif 
-    exe "normal zf"
 endfunction
 "}}}
 
