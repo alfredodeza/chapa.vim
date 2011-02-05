@@ -13,6 +13,16 @@ if exists("g:loaded_chapa") || &cp
 endif
 
 "{{{ Default Mappings 
+" Set local folding settings
+setlocal foldmethod=manual
+setlocal foldtext=ChapaCustomFoldText()
+
+if (exists('g:chapa_default_mappings') || exists('g:chapa_repeat_mappings'))
+    " Repeat Mappings
+    nmap <C-h> <Plug>ChapaOppositeRepeat
+    nmap <C-l> <Plug>ChapaRepeat
+endif
+
 if (exists('g:chapa_default_mappings'))
     " Function Movement
     nmap fnf <Plug>ChapaNextFunction
@@ -59,10 +69,6 @@ if (exists('g:chapa_default_mappings'))
     nmap cnf <Plug>ChapaCommentNextFunction
     nmap cpf <Plug>ChapaCommentPreviousFunction
 
-    " Repeat Mappings
-    nmap <C-h> <Plug>ChapaOppositeRepeat
-    nmap <C-l> <Plug>ChapaRepeat
-
     " Folding Method
     nmap zim <Plug>ChapaFoldThisMethod
     nmap znm <Plug>ChapaFoldNextMethod
@@ -95,10 +101,7 @@ function! s:Echo(msg)
 endfun
 
 
-" Set the fold title right if we have a decorator
-set foldtext=ChapaFoldText()
-set foldmethod=manual
-function! ChapaFoldText()
+function! ChapaCustomFoldText()
     let line = getline(v:foldstart)
     if (line =~ '\v^\s*\@')
         let decorator_line = v:foldstart + 1
@@ -265,6 +268,7 @@ function! s:PythonFoldObject(obj, direction, count)
         execute "normal VG" 
     endif
     execute "normal zf"
+    return 1
 endfunction
 
 
