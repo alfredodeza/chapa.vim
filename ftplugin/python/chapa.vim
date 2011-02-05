@@ -17,13 +17,14 @@ endif
 setlocal foldmethod=manual
 setlocal foldtext=ChapaCustomFoldText()
 
-if (exists('g:chapa_default_mappings') || exists('g:chapa_repeat_mappings'))
-    " Repeat Mappings
-    nmap <C-h> <Plug>ChapaOppositeRepeat
-    nmap <C-l> <Plug>ChapaRepeat
-endif
 
 if (exists('g:chapa_default_mappings'))
+    if (! exists('g:chapa_no_repeat_mappings'))
+        " Repeat Mappings
+        nmap <C-h> <Plug>ChapaOppositeRepeat
+        nmap <C-l> <Plug>ChapaRepeat
+    endif
+
     " Function Movement
     nmap fnf <Plug>ChapaNextFunction
     nmap fif <Plug>ChapaInFunction

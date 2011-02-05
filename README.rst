@@ -104,23 +104,6 @@ defaults are mapped::
     nmap znf <Plug>ChapaFoldNextFunction
     nmap zpf <Plug>ChapaFoldPreviousFunction
 
-    """""""""""""""""""""""""""""""""""""""""""""
-    " Ruby-Only Section
-    """""""""""""""""""""""""""""""""""""""""""""
-
-    " Comment Module 
-    nmap ciM <Plug>ChapaCommentThisModule
-    nmap cnM <Plug>ChapaCommentNextModule
-    nmap cpM <Plug>ChapaCommentPreviousModule
-
-    " Module Visual Select
-    nmap vnM <Plug>ChapaVisualNextModule
-    nmap viM <Plug>ChapaVisualThisModule
-    nmap vpM <Plug>ChapaVisualPreviousModule
-
-    " Module Movement
-    nmap fnM <Plug>ChapaNextModule
-    nmap fpM <Plug>ChapaPreviousModule
 
 If the requested search (function, class or method) is not found, the call simply 
 returns and nothing should happen. However, there is an error message that should 
