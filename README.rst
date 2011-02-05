@@ -40,8 +40,18 @@ your vimrc::
 
     let g:chapa_default_mappings = 1
 
+You can also make the repeat actions for the plugin optional. If the above 
+variable is set but you don't like the repeat mappings, set the following 
+in your vimrc::
+
+    let g:chapa_no_repeat_mappings = 1
+
 You can map those callables to anything you want, but below is how the 
 defaults are mapped::
+
+    " Repeat Mappings
+    nmap <C-h> <Plug>ChapaOppositeRepeat
+    nmap <C-l> <Plug>ChapaRepeat
 
     " Function Movement
     nmap fnf <Plug>ChapaNextFunction
@@ -84,10 +94,6 @@ defaults are mapped::
     nmap cif <Plug>ChapaCommentThisFunction
     nmap cnf <Plug>ChapaCommentNextFunction
     nmap cpf <Plug>ChapaCommentPreviousFunction
-
-    " Repeat Mappings
-    nmap <C-h> <Plug>ChapaOppositeRepeat
-    nmap <C-l> <Plug>ChapaRepeat
 
     " Folding Method
     nmap zim <Plug>ChapaFoldThisMethod
