@@ -531,8 +531,9 @@ endfunction
 " Comment Class Selections:
 "
 function! s:CommentPreviousClass()
+    let action_count = v:count1
     let inside = s:IsInside("class")
-    let times = v:count1+inside
+    let times = action_count+inside
     if (! s:PythonCommentObject("class", -1, times))
         call s:Echo("Could not match previous class for commenting")
     endif 
@@ -554,8 +555,9 @@ endfunction
 " Comment Method Selections:
 "
 function! s:CommentPreviousMethod()
+    let action_count = v:count1
     let inside = s:IsInside("method")
-    let times = v:count1+inside
+    let times = action_count+inside
     if (! s:PythonCommentObject("method", -1, times))
         call s:Echo("Could not match previous method for commenting")
     endif 
@@ -577,8 +579,9 @@ endfunction
 " Comment Function Selections:
 "
 function! s:CommentPreviousFunction()
+    let action_count = v:count1
     let inside = s:IsInside("function")
-    let times = v:count1+inside
+    let times = action_count+inside
     if (! s:PythonCommentObject("function", -1, times))
         call s:Echo("Could not match previous function for commenting")
     endif 
@@ -607,8 +610,9 @@ function! s:VisualNextClass()
 endfunction
 
 function! s:VisualPreviousClass()
+    let action_count = v:count1
     let inside = s:IsInside("class")
-    let times = v:count1+inside
+    let times = action_count+inside
     if (! s:PythonSelectObject("class", -1, times))
         call s:Echo("Could not match previous class for visual selection")
     endif 
@@ -629,8 +633,9 @@ function! s:VisualNextFunction()
 endfunction
 
 function! s:VisualPreviousFunction()
+    let action_count = v:count1
     let inside = s:IsInside("function")
-    let times = v:count1+inside
+    let times = action_count+inside
     if (! s:PythonSelectObject("function", -1, times))
         call s:Echo("Could not match previous function for visual selection")
     endif 
@@ -650,8 +655,9 @@ function! s:VisualNextMethod()
 endfunction
 
 function! s:VisualPreviousMethod()
+    let action_count = v:count1
     let inside = s:IsInside("method")
-    let times = v:count1+inside
+    let times = action_count+inside
     if (! s:PythonSelectObject("method", -1, times))
         call s:Echo("Could not match previous method for visual selection")
     endif 
@@ -668,11 +674,12 @@ endfunction
 " 
 " Class:
 function! s:PreviousClass(record)
+    let action_count = v:count1
     if (a:record == 1)
         let g:chapa_last_action = "s:PreviousClass(0)"
     endif
     let inside = s:IsInside("class")
-    let times = v:count1+inside
+    let times = action_count+inside
     if (! s:FindPythonObject("class", -1, times))
         call s:Echo("Could not match previous class")
     endif 
@@ -695,11 +702,12 @@ endfunction
 
 " Method:
 function! s:PreviousMethod(record)
+    let action_count = v:count1
     if (a:record == 1)
         let g:chapa_last_action = "s:PreviousMethod(0)"
     endif
     let inside = s:IsInside("method")
-    let times = v:count1+inside
+    let times = action_count+inside
     if (! s:FindPythonObject("method", -1, times))
         call s:Echo("Could not match previous method")
     endif 
@@ -722,11 +730,12 @@ endfunction
 
 " Function:
 function! s:PreviousFunction(record)
+    let action_count = v:count1
     if (a:record == 1)
         let g:chapa_last_action = "s:PreviousFunction(0)"
     endif
     let inside = s:IsInside("function")
-    let times = v:count1+inside
+    let times = action_count+inside
     if (! s:FindPythonObject("function", -1, times))
         call s:Echo("Could not match previous function")
     endif 
@@ -759,8 +768,9 @@ function! s:FoldThisMethod()
 endfunction
 
 function! s:FoldPreviousMethod()
+    let action_count = v:count1
     let inside = s:IsInside("method")
-    let times = v:count1+inside
+    let times = action_count+inside
     if (! s:PythonFoldObject("method", -1, times))
         call s:Echo("Could not match previous method for folding")
     endif 
@@ -781,8 +791,9 @@ function! s:FoldThisClass()
 endfunction
 
 function! s:FoldPreviousClass()
+    let action_count = v:count1
     let inside = s:IsInside("class")
-    let times = v:count1+inside
+    let times = action_count+inside
     if (! s:FindPythonObject("class", -1, times))
         call s:Echo("Could not match previous class for folding")
     endif 
@@ -803,8 +814,9 @@ function! s:FoldThisFunction()
 endfunction
 
 function! s:FoldPreviousFunction()
+    let action_count = v:count1
     let inside = s:IsInside("function")
-    let times = v:count1+inside
+    let times = action_count+inside
     if (! s:PythonFoldObject("function", -1, times))
         call s:Echo("Could not match previous function for folding")
     endif 
