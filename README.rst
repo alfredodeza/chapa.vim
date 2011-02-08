@@ -55,14 +55,17 @@ defaults are mapped::
 
     " Function Movement
     nmap fnf <Plug>ChapaNextFunction
+    nmap fif <Plug>ChapaInFunction
     nmap fpf <Plug>ChapaPreviousFunction
 
     " Class Movement
-    nmap fnc <Plug>ChapaNextClass
+    nmap fnc <Plug>ChapaNextClass  
+    nmap fic <Plug>ChapaInClass
     nmap fpc <Plug>ChapaPreviousClass
 
     " Method Movement
     nmap fnm <Plug>ChapaNextMethod
+    nmap fim <Plug>ChapaInMethod
     nmap fpm <Plug>ChapaPreviousMethod
 
     " Class Visual Select 
