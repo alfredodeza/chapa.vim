@@ -188,10 +188,6 @@ function! s:PythonCommentObject(obj, direction, count)
         let regex = " s/^/#/"
     endif
         
-    echo "Beginning " . beg
-    echo "Until " . until
-    echo "Has comments " . has_comments
-    echo "Regex " . regex
     if line_moves > 0
         execute beg . "," . until . regex
     else
