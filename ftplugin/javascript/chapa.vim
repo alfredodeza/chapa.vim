@@ -28,9 +28,11 @@ if (exists('g:chapa_default_mappings'))
     nmap cnf <Plug>ChapaCommentNextFunction
     nmap cpf <Plug>ChapaCommentPreviousFunction
 
-    " Repeat Mappings
-    nmap <C-h> <Plug>ChapaOppositeRepeat
-    nmap <C-l> <Plug>ChapaRepeat
+    if (! exists('g:chapa_no_repeat_mappings'))
+      " Repeat Mappings
+      nmap <C-h> <Plug>ChapaOppositeRepeat
+      nmap <C-l> <Plug>ChapaRepeat
+    endif
 endif
 
 "{{{ Helpers
