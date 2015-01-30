@@ -13,28 +13,29 @@ if exists("b:loaded_chapa") || &cp
 endif
 let b:loaded_chapa = 1
 
-"{{{ Default Mappings 
-if (exists('g:chapa_default_mappings'))
+"{{{ Default Mappings
+if (exists('g:chapa_default_mappings')) && g:chapa_default_mappings
     " Function Movement
-    nmap fnf <Plug>ChapaNextFunction
-    nmap fpf <Plug>ChapaPreviousFunction
+    nmap <buffer> fnf <Plug>ChapaNextFunction
+    nmap <buffer> fpf <Plug>ChapaPreviousFunction
 
     " Function Visual Select
-    nmap vnf <Plug>ChapaVisualNextFunction
-    nmap vif <Plug>ChapaVisualThisFunction
-    nmap vpf <Plug>ChapaVisualPreviousFunction
+    nmap <buffer> vnf <Plug>ChapaVisualNextFunction
+    nmap <buffer> vif <Plug>ChapaVisualThisFunction
+    nmap <buffer> vpf <Plug>ChapaVisualPreviousFunction
 
-    " Comment Function 
-    nmap cif <Plug>ChapaCommentThisFunction
-    nmap cnf <Plug>ChapaCommentNextFunction
-    nmap cpf <Plug>ChapaCommentPreviousFunction
+    " Comment Function
+    nmap <buffer> cif <Plug>ChapaCommentThisFunction
+    nmap <buffer> cnf <Plug>ChapaCommentNextFunction
+    nmap <buffer> cpf <Plug>ChapaCommentPreviousFunction
 
     if (! exists('g:chapa_no_repeat_mappings'))
       " Repeat Mappings
-      nmap <C-h> <Plug>ChapaOppositeRepeat
-      nmap <C-l> <Plug>ChapaRepeat
+      nmap <buffer> <C-h> <Plug>ChapaOppositeRepeat
+      nmap <buffer> <C-l> <Plug>ChapaRepeat
     endif
 endif
+"}}}
 
 "{{{ Helpers
 
@@ -358,20 +359,20 @@ endfunction
 
 "{{{ Misc 
 " Comment Function: 
-nnoremap <silent> <Plug>ChapaCommentPreviousFunction   :<C-U>call <SID>CommentPreviousFunction()  <CR>
-nnoremap <silent> <Plug>ChapaCommentNextFunction       :<C-U>call <SID>CommentNextFunction()      <CR>
-nnoremap <silent> <Plug>ChapaCommentThisFunction       :<C-U>call <SID>CommentThisFunction()      <CR>
+nnoremap <silent> <buffer> <Plug>ChapaCommentPreviousFunction   :<C-U>call <SID>CommentPreviousFunction()  <CR>
+nnoremap <silent> <buffer> <Plug>ChapaCommentNextFunction       :<C-U>call <SID>CommentNextFunction()      <CR>
+nnoremap <silent> <buffer> <Plug>ChapaCommentThisFunction       :<C-U>call <SID>CommentThisFunction()      <CR>
 
 " Visual Select Function:
-nnoremap <silent> <Plug>ChapaVisualNextFunction     :<C-U>call <SID>VisualNextFunction()    <CR>
-nnoremap <silent> <Plug>ChapaVisualPreviousFunction :<C-U>call <SID>VisualPreviousFunction()<CR>
-nnoremap <silent> <Plug>ChapaVisualThisFunction     :<C-U>call <SID>VisualThisFunction()    <CR>
+nnoremap <silent> <buffer> <Plug>ChapaVisualNextFunction     :<C-U>call <SID>VisualNextFunction()    <CR>
+nnoremap <silent> <buffer> <Plug>ChapaVisualPreviousFunction :<C-U>call <SID>VisualPreviousFunction()<CR>
+nnoremap <silent> <buffer> <Plug>ChapaVisualThisFunction     :<C-U>call <SID>VisualThisFunction()    <CR>
 
 " Function Movement:
-nnoremap <silent> <Plug>ChapaPreviousFunction       :<C-U>call <SID>PreviousFunction(1)     <CR>
-nnoremap <silent> <Plug>ChapaNextFunction           :<C-U>call <SID>NextFunction(1)         <CR>
+nnoremap <silent> <buffer> <Plug>ChapaPreviousFunction       :<C-U>call <SID>PreviousFunction(1)     <CR>
+nnoremap <silent> <buffer> <Plug>ChapaNextFunction           :<C-U>call <SID>NextFunction(1)         <CR>
 
 " Repeating Movements:
-nnoremap <silent> <Plug>ChapaOppositeRepeat         :<C-U>call <SID>BackwardRepeat()        <CR>
-nnoremap <silent> <Plug>ChapaRepeat                 :<C-U>call <SID>Repeat()                <CR>
+nnoremap <silent> <buffer> <Plug>ChapaOppositeRepeat         :<C-U>call <SID>BackwardRepeat()        <CR>
+nnoremap <silent> <buffer> <Plug>ChapaRepeat                 :<C-U>call <SID>Repeat()                <CR>
 "}}}
