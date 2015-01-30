@@ -1,6 +1,6 @@
 " File:        chapa.vim
 " Description: Go to or visually select the next/previous class, method or
-"              function in Python.
+"              function in JavaScript.
 " Maintainer:  Alfredo Deza <alfredodeza AT gmail.com>
 " License:     MIT
 " Notes:       A lot of the code within was adapted/copied from python.vim 
