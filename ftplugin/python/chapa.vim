@@ -8,9 +8,10 @@
 "
 "============================================================================
 
-if exists("g:loaded_chapa") || &cp 
+if exists("b:loaded_chapa") || &cp
   finish
 endif
+let b:loaded_chapa = 1
 
 "{{{ Default Mappings 
 " Set local folding settings
