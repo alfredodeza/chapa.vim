@@ -116,6 +116,10 @@ defaults are mapped::
     nmap <buffer> zpf <Plug>ChapaFoldPreviousFunction
 
 
+Since these should only be defined for buffers of the supported filetypes, if
+you don't enable the default mappings you'll want to define your own through e.g.
+``~/.vim/after/ftplugin/python.vim`` or with ``autocmd``\s.
+
 If the requested search (function, class or method) is not found, the call simply 
 returns and nothing should happen. However, there is an error message that should 
 display by default, explaining what it was supposed to search and in what 
