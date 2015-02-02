@@ -8,83 +8,84 @@
 "
 "============================================================================
 
-if exists("g:loaded_chapa") || &cp 
+if exists("b:loaded_chapa") || &cp
   finish
 endif
+let b:loaded_chapa = 1
 
-"{{{ Default Mappings 
 " Set local folding settings
 setlocal foldmethod=manual
 setlocal foldtext=ChapaCustomFoldText()
 
-
-if (exists('g:chapa_default_mappings'))
+"{{{ Default Mappings
+if (exists('g:chapa_default_mappings')) && g:chapa_default_mappings
     if (! exists('g:chapa_no_repeat_mappings'))
         " Repeat Mappings
-        nmap <C-h> <Plug>ChapaOppositeRepeat
-        nmap <C-l> <Plug>ChapaRepeat
+        nmap <buffer> <C-h> <Plug>ChapaOppositeRepeat
+        nmap <buffer> <C-l> <Plug>ChapaRepeat
     endif
 
     " Function Movement
-    nmap fnf <Plug>ChapaNextFunction
-    nmap fif <Plug>ChapaInFunction
-    nmap fpf <Plug>ChapaPreviousFunction
+    nmap <buffer> fnf <Plug>ChapaNextFunction
+    nmap <buffer> fif <Plug>ChapaInFunction
+    nmap <buffer> fpf <Plug>ChapaPreviousFunction
 
     " Class Movement
-    nmap fnc <Plug>ChapaNextClass
-    nmap fic <Plug>ChapaInClass
-    nmap fpc <Plug>ChapaPreviousClass
+    nmap <buffer> fnc <Plug>ChapaNextClass
+    nmap <buffer> fic <Plug>ChapaInClass
+    nmap <buffer> fpc <Plug>ChapaPreviousClass
 
     " Method Movement
-    nmap fnm <Plug>ChapaNextMethod
-    nmap fim <Plug>ChapaInMethod
-    nmap fpm <Plug>ChapaPreviousMethod
+    nmap <buffer> fnm <Plug>ChapaNextMethod
+    nmap <buffer> fim <Plug>ChapaInMethod
+    nmap <buffer> fpm <Plug>ChapaPreviousMethod
 
     " Class Visual Select 
-    nmap vnc <Plug>ChapaVisualNextClass
-    nmap vic <Plug>ChapaVisualThisClass 
-    nmap vpc <Plug>ChapaVisualPreviousClass
+    nmap <buffer> vnc <Plug>ChapaVisualNextClass
+    nmap <buffer> vic <Plug>ChapaVisualThisClass
+    nmap <buffer> vpc <Plug>ChapaVisualPreviousClass
 
     " Method Visual Select
-    nmap vnm <Plug>ChapaVisualNextMethod
-    nmap vim <Plug>ChapaVisualThisMethod
-    nmap vpm <Plug>ChapaVisualPreviousMethod
+    nmap <buffer> vnm <Plug>ChapaVisualNextMethod
+    nmap <buffer> vim <Plug>ChapaVisualThisMethod
+    nmap <buffer> vpm <Plug>ChapaVisualPreviousMethod
 
     " Function Visual Select
-    nmap vnf <Plug>ChapaVisualNextFunction
-    nmap vif <Plug>ChapaVisualThisFunction
-    nmap vpf <Plug>ChapaVisualPreviousFunction
+    nmap <buffer> vnf <Plug>ChapaVisualNextFunction
+    nmap <buffer> vif <Plug>ChapaVisualThisFunction
+    nmap <buffer> vpf <Plug>ChapaVisualPreviousFunction
 
     " Comment Class
-    nmap cic <Plug>ChapaCommentThisClass
-    nmap cnc <Plug>ChapaCommentNextClass
-    nmap cpc <Plug>ChapaCommentPreviousClass
+    nmap <buffer> cic <Plug>ChapaCommentThisClass
+    nmap <buffer> cnc <Plug>ChapaCommentNextClass
+    nmap <buffer> cpc <Plug>ChapaCommentPreviousClass
 
-    " Comment Method 
-    nmap cim <Plug>ChapaCommentThisMethod 
-    nmap cnm <Plug>ChapaCommentNextMethod 
-    nmap cpm <Plug>ChapaCommentPreviousMethod 
+    " Comment Method
+    nmap <buffer> cim <Plug>ChapaCommentThisMethod
+    nmap <buffer> cnm <Plug>ChapaCommentNextMethod
+    nmap <buffer> cpm <Plug>ChapaCommentPreviousMethod
 
-    " Comment Function 
-    nmap cif <Plug>ChapaCommentThisFunction
-    nmap cnf <Plug>ChapaCommentNextFunction
-    nmap cpf <Plug>ChapaCommentPreviousFunction
+    " Comment Function
+    nmap <buffer> cif <Plug>ChapaCommentThisFunction
+    nmap <buffer> cnf <Plug>ChapaCommentNextFunction
+    nmap <buffer> cpf <Plug>ChapaCommentPreviousFunction
 
     " Folding Method
-    nmap zim <Plug>ChapaFoldThisMethod
-    nmap znm <Plug>ChapaFoldNextMethod
-    nmap zpm <Plug>ChapaFoldPreviousMethod
+    nmap <buffer> zim <Plug>ChapaFoldThisMethod
+    nmap <buffer> znm <Plug>ChapaFoldNextMethod
+    nmap <buffer> zpm <Plug>ChapaFoldPreviousMethod
 
     " Folding Class
-    nmap zic <Plug>ChapaFoldThisClass
-    nmap znc <Plug>ChapaFoldNextClass
-    nmap zpc <Plug>ChapaFoldPreviousClass
+    nmap <buffer> zic <Plug>ChapaFoldThisClass
+    nmap <buffer> znc <Plug>ChapaFoldNextClass
+    nmap <buffer> zpc <Plug>ChapaFoldPreviousClass
 
     " Folding Function
-    nmap zif <Plug>ChapaFoldThisFunction
-    nmap znf <Plug>ChapaFoldNextFunction
-    nmap zpf <Plug>ChapaFoldPreviousFunction
+    nmap <buffer> zif <Plug>ChapaFoldThisFunction
+    nmap <buffer> znf <Plug>ChapaFoldNextFunction
+    nmap <buffer> zpf <Plug>ChapaFoldPreviousFunction
 endif
+"}}}
 
 "{{{ Helpers
 
@@ -827,67 +828,67 @@ endfunction
 
 "{{{ Misc 
 " Comment Class: 
-nnoremap <silent> <Plug>ChapaCommentPreviousClass   :<C-U>call <SID>CommentPreviousClass() <CR>
-nnoremap <silent> <Plug>ChapaCommentNextClass       :<C-U>call <SID>CommentNextClass()     <CR>
-nnoremap <silent> <Plug>ChapaCommentThisClass       :<C-U>call <SID>CommentThisClass()     <CR>
+nnoremap <silent> <buffer> <Plug>ChapaCommentPreviousClass   :<C-U>call <SID>CommentPreviousClass() <CR>
+nnoremap <silent> <buffer> <Plug>ChapaCommentNextClass       :<C-U>call <SID>CommentNextClass()     <CR>
+nnoremap <silent> <buffer> <Plug>ChapaCommentThisClass       :<C-U>call <SID>CommentThisClass()     <CR>
 
 " Comment Method: 
-nnoremap <silent> <Plug>ChapaCommentPreviousMethod   :<C-U>call <SID>CommentPreviousMethod()<CR>
-nnoremap <silent> <Plug>ChapaCommentNextMethod       :<C-U>call <SID>CommentNextMethod()    <CR>
-nnoremap <silent> <Plug>ChapaCommentThisMethod       :<C-U>call <SID>CommentThisMethod()    <CR>
+nnoremap <silent> <buffer> <Plug>ChapaCommentPreviousMethod   :<C-U>call <SID>CommentPreviousMethod()<CR>
+nnoremap <silent> <buffer> <Plug>ChapaCommentNextMethod       :<C-U>call <SID>CommentNextMethod()    <CR>
+nnoremap <silent> <buffer> <Plug>ChapaCommentThisMethod       :<C-U>call <SID>CommentThisMethod()    <CR>
 
 " Comment Function: 
-nnoremap <silent> <Plug>ChapaCommentPreviousFunction   :<C-U>call <SID>CommentPreviousFunction()  <CR>
-nnoremap <silent> <Plug>ChapaCommentNextFunction       :<C-U>call <SID>CommentNextFunction()      <CR>
-nnoremap <silent> <Plug>ChapaCommentThisFunction       :<C-U>call <SID>CommentThisFunction()      <CR>
+nnoremap <silent> <buffer> <Plug>ChapaCommentPreviousFunction   :<C-U>call <SID>CommentPreviousFunction()  <CR>
+nnoremap <silent> <buffer> <Plug>ChapaCommentNextFunction       :<C-U>call <SID>CommentNextFunction()      <CR>
+nnoremap <silent> <buffer> <Plug>ChapaCommentThisFunction       :<C-U>call <SID>CommentThisFunction()      <CR>
 
 " Visual Select Class:
-nnoremap <silent> <Plug>ChapaVisualNextClass        :<C-U>call <SID>VisualNextClass()       <CR>
-nnoremap <silent> <Plug>ChapaVisualPreviousClass    :<C-U>call <SID>VisualPreviousClass()   <CR>
-nnoremap <silent> <Plug>ChapaVisualThisClass        :<C-U>call <SID>VisualThisClass()       <CR>
+nnoremap <silent> <buffer> <Plug>ChapaVisualNextClass        :<C-U>call <SID>VisualNextClass()       <CR>
+nnoremap <silent> <buffer> <Plug>ChapaVisualPreviousClass    :<C-U>call <SID>VisualPreviousClass()   <CR>
+nnoremap <silent> <buffer> <Plug>ChapaVisualThisClass        :<C-U>call <SID>VisualThisClass()       <CR>
 
 " Visual Select Method:
-nnoremap <silent> <Plug>ChapaVisualNextMethod       :<C-U>call <SID>VisualNextMethod()      <CR>
-nnoremap <silent> <Plug>ChapaVisualPreviousMethod   :<C-U>call <SID>VisualPreviousMethod()  <CR>
-nnoremap <silent> <PLug>ChapaVisualThisMethod       :<C-U>call <SID>VisualThisMethod()      <CR>
+nnoremap <silent> <buffer> <Plug>ChapaVisualNextMethod       :<C-U>call <SID>VisualNextMethod()      <CR>
+nnoremap <silent> <buffer> <Plug>ChapaVisualPreviousMethod   :<C-U>call <SID>VisualPreviousMethod()  <CR>
+nnoremap <silent> <buffer> <PLug>ChapaVisualThisMethod       :<C-U>call <SID>VisualThisMethod()      <CR>
 
 " Visual Select Function:
-nnoremap <silent> <Plug>ChapaVisualNextFunction     :<C-U>call <SID>VisualNextFunction()    <CR>
-nnoremap <silent> <Plug>ChapaVisualPreviousFunction :<C-U>call <SID>VisualPreviousFunction()<CR>
-nnoremap <silent> <Plug>ChapaVisualThisFunction     :<C-U>call <SID>VisualThisFunction()    <CR>
+nnoremap <silent> <buffer> <Plug>ChapaVisualNextFunction     :<C-U>call <SID>VisualNextFunction()    <CR>
+nnoremap <silent> <buffer> <Plug>ChapaVisualPreviousFunction :<C-U>call <SID>VisualPreviousFunction()<CR>
+nnoremap <silent> <buffer> <Plug>ChapaVisualThisFunction     :<C-U>call <SID>VisualThisFunction()    <CR>
 
 " Class Movement:
-nnoremap <silent> <Plug>ChapaPreviousClass          :<C-U>call <SID>PreviousClass(1)        <CR>
-nnoremap <silent> <Plug>ChapaInClass                :<C-U>call <SID>InClass()               <CR>
-nnoremap <silent> <Plug>ChapaNextClass              :<C-U>call <SID>NextClass(1)            <CR>
+nnoremap <silent> <buffer> <Plug>ChapaPreviousClass          :<C-U>call <SID>PreviousClass(1)        <CR>
+nnoremap <silent> <buffer> <Plug>ChapaInClass                :<C-U>call <SID>InClass()               <CR>
+nnoremap <silent> <buffer> <Plug>ChapaNextClass              :<C-U>call <SID>NextClass(1)            <CR>
 
 " Method Movement:
-nnoremap <silent> <Plug>ChapaPreviousMethod         :<C-U>call <SID>PreviousMethod(1)       <CR>
-nnoremap <silent> <Plug>ChapaInMethod               :<C-U>call <SID>InMethod()              <CR>
-nnoremap <silent> <Plug>ChapaNextMethod             :<C-U>call <SID>NextMethod(1)           <CR>
+nnoremap <silent> <buffer> <Plug>ChapaPreviousMethod         :<C-U>call <SID>PreviousMethod(1)       <CR>
+nnoremap <silent> <buffer> <Plug>ChapaInMethod               :<C-U>call <SID>InMethod()              <CR>
+nnoremap <silent> <buffer> <Plug>ChapaNextMethod             :<C-U>call <SID>NextMethod(1)           <CR>
 
 " Function Movement:
-nnoremap <silent> <Plug>ChapaPreviousFunction       :<C-U>call <SID>PreviousFunction(1)     <CR>
-nnoremap <silent> <Plug>ChapaInFunction             :<C-U>call <SID>InFunction()            <CR>
-nnoremap <silent> <Plug>ChapaNextFunction           :<C-U>call <SID>NextFunction(1)         <CR>
+nnoremap <silent> <buffer> <Plug>ChapaPreviousFunction       :<C-U>call <SID>PreviousFunction(1)     <CR>
+nnoremap <silent> <buffer> <Plug>ChapaInFunction             :<C-U>call <SID>InFunction()            <CR>
+nnoremap <silent> <buffer> <Plug>ChapaNextFunction           :<C-U>call <SID>NextFunction(1)         <CR>
 
 " Repeating Movements:
-nnoremap <silent> <Plug>ChapaOppositeRepeat         :<C-U>call <SID>BackwardRepeat()        <CR>
-nnoremap <silent> <Plug>ChapaRepeat                 :<C-U>call <SID>Repeat()                <CR>
+nnoremap <silent> <buffer> <Plug>ChapaOppositeRepeat         :<C-U>call <SID>BackwardRepeat()        <CR>
+nnoremap <silent> <buffer> <Plug>ChapaRepeat                 :<C-U>call <SID>Repeat()                <CR>
 
 " Folding Method:
-nnoremap <silent> <Plug>ChapaFoldThisMethod         :<C-U>call <SID>FoldThisMethod()        <CR>
-nnoremap <silent> <Plug>ChapaFoldNextMethod         :<C-U>call <SID>FoldNextMethod()        <CR>
-nnoremap <silent> <Plug>ChapaFoldPreviousMethod     :<C-U>call <SID>FoldPreviousMethod()    <CR>
+nnoremap <silent> <buffer> <Plug>ChapaFoldThisMethod         :<C-U>call <SID>FoldThisMethod()        <CR>
+nnoremap <silent> <buffer> <Plug>ChapaFoldNextMethod         :<C-U>call <SID>FoldNextMethod()        <CR>
+nnoremap <silent> <buffer> <Plug>ChapaFoldPreviousMethod     :<C-U>call <SID>FoldPreviousMethod()    <CR>
 
 " Folding Class:
-nnoremap <silent> <Plug>ChapaFoldThisClass          :<C-U>call <SID>FoldThisClass()         <CR>
-nnoremap <silent> <Plug>ChapaFoldNextClass          :<C-U>call <SID>FoldNextClass()         <CR>
-nnoremap <silent> <Plug>ChapaFoldPreviousClass      :<C-U>call <SID>FoldPreviousClass()     <CR>
+nnoremap <silent> <buffer> <Plug>ChapaFoldThisClass          :<C-U>call <SID>FoldThisClass()         <CR>
+nnoremap <silent> <buffer> <Plug>ChapaFoldNextClass          :<C-U>call <SID>FoldNextClass()         <CR>
+nnoremap <silent> <buffer> <Plug>ChapaFoldPreviousClass      :<C-U>call <SID>FoldPreviousClass()     <CR>
 
 " Fold Function:
-nnoremap <silent> <Plug>ChapaFoldThisFunction       :<C-U>call <SID>FoldThisFunction()      <CR>
-nnoremap <silent> <Plug>ChapaFoldNextFunction       :<C-U>call <SID>FoldNextFunction()      <CR>
-nnoremap <silent> <Plug>ChapaFoldPreviousFunction   :<C-U>call <SID>FoldPreviousFunction()  <CR>
+nnoremap <silent> <buffer> <Plug>ChapaFoldThisFunction       :<C-U>call <SID>FoldThisFunction()      <CR>
+nnoremap <silent> <buffer> <Plug>ChapaFoldNextFunction       :<C-U>call <SID>FoldNextFunction()      <CR>
+nnoremap <silent> <buffer> <Plug>ChapaFoldPreviousFunction   :<C-U>call <SID>FoldPreviousFunction()  <CR>
 
 "}}}

@@ -52,69 +52,73 @@ You can map those callables to anything you want, but below is how the
 defaults are mapped::
 
     " Repeat Mappings
-    nmap <C-h> <Plug>ChapaOppositeRepeat
-    nmap <C-l> <Plug>ChapaRepeat
+    nmap <buffer> <C-h> <Plug>ChapaOppositeRepeat
+    nmap <buffer> <C-l> <Plug>ChapaRepeat
 
     " Function Movement
-    nmap fnf <Plug>ChapaNextFunction
-    nmap fif <Plug>ChapaInFunction
-    nmap fpf <Plug>ChapaPreviousFunction
+    nmap <buffer> fnf <Plug>ChapaNextFunction
+    nmap <buffer> fif <Plug>ChapaInFunction
+    nmap <buffer> fpf <Plug>ChapaPreviousFunction
 
     " Class Movement
-    nmap fnc <Plug>ChapaNextClass  
-    nmap fic <Plug>ChapaInClass
-    nmap fpc <Plug>ChapaPreviousClass
+    nmap <buffer> fnc <Plug>ChapaNextClass
+    nmap <buffer> fic <Plug>ChapaInClass
+    nmap <buffer> fpc <Plug>ChapaPreviousClass
 
     " Method Movement
-    nmap fnm <Plug>ChapaNextMethod
-    nmap fim <Plug>ChapaInMethod
-    nmap fpm <Plug>ChapaPreviousMethod
+    nmap <buffer> fnm <Plug>ChapaNextMethod
+    nmap <buffer> fim <Plug>ChapaInMethod
+    nmap <buffer> fpm <Plug>ChapaPreviousMethod
 
     " Class Visual Select 
-    nmap vnc <Plug>ChapaVisualNextClass
-    nmap vic <Plug>ChapaVisualThisClass 
-    nmap vpc <Plug>ChapaVisualPreviousClass
+    nmap <buffer> vnc <Plug>ChapaVisualNextClass
+    nmap <buffer> vic <Plug>ChapaVisualThisClass
+    nmap <buffer> vpc <Plug>ChapaVisualPreviousClass
 
     " Method Visual Select
-    nmap vnm <Plug>ChapaVisualNextMethod
-    nmap vim <Plug>ChapaVisualThisMethod
-    nmap vpm <Plug>ChapaVisualPreviousMethod
+    nmap <buffer> vnm <Plug>ChapaVisualNextMethod
+    nmap <buffer> vim <Plug>ChapaVisualThisMethod
+    nmap <buffer> vpm <Plug>ChapaVisualPreviousMethod
 
     " Function Visual Select
-    nmap vnf <Plug>ChapaVisualNextFunction
-    nmap vif <Plug>ChapaVisualThisFunction
-    nmap vpf <Plug>ChapaVisualPreviousFunction
+    nmap <buffer> vnf <Plug>ChapaVisualNextFunction
+    nmap <buffer> vif <Plug>ChapaVisualThisFunction
+    nmap <buffer> vpf <Plug>ChapaVisualPreviousFunction
 
     " Comment Class
-    nmap cic <Plug>ChapaCommentThisClass
-    nmap cnc <Plug>ChapaCommentNextClass
-    nmap cpc <Plug>ChapaCommentPreviousClass
+    nmap <buffer> cic <Plug>ChapaCommentThisClass
+    nmap <buffer> cnc <Plug>ChapaCommentNextClass
+    nmap <buffer> cpc <Plug>ChapaCommentPreviousClass
 
     " Comment Method 
-    nmap cim <Plug>ChapaCommentThisMethod 
-    nmap cnm <Plug>ChapaCommentNextMethod 
-    nmap cpm <Plug>ChapaCommentPreviousMethod 
+    nmap <buffer> cim <Plug>ChapaCommentThisMethod
+    nmap <buffer> cnm <Plug>ChapaCommentNextMethod
+    nmap <buffer> cpm <Plug>ChapaCommentPreviousMethod
 
     " Comment Function 
-    nmap cif <Plug>ChapaCommentThisFunction
-    nmap cnf <Plug>ChapaCommentNextFunction
-    nmap cpf <Plug>ChapaCommentPreviousFunction
+    nmap <buffer> cif <Plug>ChapaCommentThisFunction
+    nmap <buffer> cnf <Plug>ChapaCommentNextFunction
+    nmap <buffer> cpf <Plug>ChapaCommentPreviousFunction
 
     " Folding Method
-    nmap zim <Plug>ChapaFoldThisMethod
-    nmap znm <Plug>ChapaFoldNextMethod
-    nmap zpm <Plug>ChapaFoldPreviousMethod
+    nmap <buffer> zim <Plug>ChapaFoldThisMethod
+    nmap <buffer> znm <Plug>ChapaFoldNextMethod
+    nmap <buffer> zpm <Plug>ChapaFoldPreviousMethod
 
     " Folding Class
-    nmap zic <Plug>ChapaFoldThisClass
-    nmap znc <Plug>ChapaFoldNextClass
-    nmap zpc <Plug>ChapaFoldPreviousClass
+    nmap <buffer> zic <Plug>ChapaFoldThisClass
+    nmap <buffer> znc <Plug>ChapaFoldNextClass
+    nmap <buffer> zpc <Plug>ChapaFoldPreviousClass
 
     " Folding Function
-    nmap zif <Plug>ChapaFoldThisFunction
-    nmap znf <Plug>ChapaFoldNextFunction
-    nmap zpf <Plug>ChapaFoldPreviousFunction
+    nmap <buffer> zif <Plug>ChapaFoldThisFunction
+    nmap <buffer> znf <Plug>ChapaFoldNextFunction
+    nmap <buffer> zpf <Plug>ChapaFoldPreviousFunction
 
+
+Since these should only be defined for buffers of the supported filetypes, if
+you don't enable the default mappings you'll want to define your own through e.g.
+``~/.vim/after/ftplugin/python.vim`` or with ``autocmd``\s.
 
 If the requested search (function, class or method) is not found, the call simply 
 returns and nothing should happen. However, there is an error message that should 
